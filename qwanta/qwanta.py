@@ -14,6 +14,107 @@ import random
 from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _VirtualStateTomography
 from .SubProcess import _TimeLag
 
+class Xperiment:
+
+    def __init__(self, timelines_path, ):
+        
+        # Infer from file
+        pass
+
+class Xperiment:
+
+    def __init__(self, timelines_path, 
+                       nodes_info_exp, 
+                       edges_info_exp, 
+                       gate_error=0,
+                       measurement_error=0,
+                       memory_time=1,
+                       strategies_list=None, 
+                       resources_dict=None,
+                       experiment=None
+                ):
+
+        if isinstance(strategies_list, str):
+            strategies_list = [strategies_list]
+
+        timelines = pd.read_excel(timelines_path, sheet_name=strategies_list)
+
+        # Convert Edges and Num trials to legit type
+        for exp in timelines:
+            timelines[exp]['Edges'] = timelines[exp]['Edges'].transform(lambda x: ast.literal_eval(x))
+            timelines[exp]['Num Trials'] = timelines[exp]['Num Trials'].transform(lambda x: True if x == 'True' else x)
+            timelines[exp]['Num Trials'] = timelines[exp]['Num Trials'].transform(lambda x: int(x) if int(x) > 1 else x) 
+            timelines[exp] = timelines[exp].to_dict('records')
+
+        self.timelines = timelines
+        self.strategies_list = list(self.timelines.keys())
+
+        # Memory error
+        def memory_error_function(time, tau=memory_time):
+            p = (np.e**(-1*(time/tau)))/4 + 0.75
+            return [p, (1- p)/3, (1- p)/3, (1- p)/3]
+
+        default_resources_dict = {
+            'numPhysicalBuffer': 20,
+            'numInternalEncodingBuffer': 20,
+            'numInternalDetectingBuffer': 10,
+            'numInternalInterfaceBuffer': 2
+        }
+        if resources_dict is None:
+            valid_resources_dict = default_resources_dict
+        else:
+            valid_resources_dict = resources_dict if all([ num in resources_dict for num in list(default_resources_dict.keys())]) else default_resources_dict
+
+        for exp in nodes_info_exp:
+            nodes_info_exp = {**valid_resources_dict, **nodes_info_exp}
+
+        self.nodes_info_exp = { exp: nodes_info_exp for exp in self.strategies_list }
+        self.edges_info_exp = { exp: edges_info_exp for exp in self.strategies_list }
+
+        self.gate_errors = { exp: gate_error for exp in self.strategies_list }
+        self.measurement_errors = { exp: measurement_error for exp in self.strategies_list }
+        self.memory_functions = { exp: memory_error_function for exp in self.strategies_list }
+        
+        self.configurations = {
+            exp : Configuration(
+                topology = self.edges_info_exp[exp], 
+                timeline = self.timelines[exp], 
+                nodes_info = self.nodes_info_exp[exp], 
+                memFunc = self.memory_functions[exp], 
+                gate_error = self.gate_errors[exp], 
+                measurementError = self.measurement_errors[exp],
+                experiment = exp, # Record experiment set with experiment name
+                message = experiment
+                )
+        for exp in self.strategies_list }
+
+        self.QuantumNetworks = {
+            exp : QuantumNetwork(self.configurations[exp])
+        for exp in self.strategies_list }
+
+    def validate(self):
+        pass 
+
+    def execute(self, multithreading=False, save_result=False):
+        
+        results = {}
+        if multithreading:
+            
+            import ray
+            ray.init()
+
+            @ray.remote
+            def single_execute(exp, save_result):
+                return self.QuantumNetworks[exp].run(save_result=save_result)
+
+            results = ray.get({exp : single_execute.remote(exp, save_result) for exp in self.strategies_list})
+        else:
+            for exp in self.strategies_list:
+                result = self.QuantumNetworks[exp].run(save_result=save_result)
+                results[exp] = result
+
+        return results
+
 class Tuner:
 
     def __init__(self, strategies):
@@ -614,7 +715,7 @@ class Configuration:
         self.numInternalDetectingBuffer = 10
         self.numInternalInterfaceBuffer = 2
         self.memFunc = [1, 0, 0, 0] if memFunc is None else memFunc # Function of memory of qubit
-        self.gateError = [1, 0, 0, 0] if gate_error is None else gate_error
+        self.gateError = 0 if gate_error is None else gate_error
         self.measurementError = 0 if measurementError is None else measurementError
         self.timeline = timeline
         self.experiment = experiment
