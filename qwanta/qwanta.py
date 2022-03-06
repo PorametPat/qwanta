@@ -4,15 +4,12 @@ from .Qubit.qubit import PhysicalQubit
 import os 
 import pandas as pd
 import seaborn as sns
-import pickle
 import dill
 import ast
 from tqdm.notebook import tqdm
 import matplotlib.pyplot as plt
 from pyvis.network import Network
 import random
-from bayes_opt import BayesianOptimization
-import hiplot as hip
 
 from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _VirtualStateTomography
 from .SubProcess import _TimeLag
@@ -20,6 +17,8 @@ from .SubProcess import _TimeLag
 class Tuner:
 
     def __init__(self, strategies):
+
+        from bayes_opt import BayesianOptimization
 
         self.optimizers = {
             exp: BayesianOptimization(
@@ -100,9 +99,6 @@ class Experiment:
 
             if nodes_info is not None:
                 self.nodes_info[exper] = [nodes_info[exper] for _ in range(len(parameters_set))]
-
-        if BSA_prob is None:
-            BSA_prob = [1]*len(parameters_set)
 
         self.parameters_set = parameters_set
         self.BSA_prob = BSA_prob
