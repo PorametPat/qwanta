@@ -15,12 +15,6 @@ import numpy as np
 from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _VirtualStateTomography
 from .SubProcess import _TimeLag
 
-class Xperiment:
-
-    def __init__(self, timelines_path, ):
-        
-        # Infer from file
-        pass
 
 class Xperiment:
 
@@ -32,7 +26,9 @@ class Xperiment:
                        memory_time=1,
                        strategies_list=None, 
                        resources_dict=None,
-                       experiment=None
+                       experiment=None,
+                       sim_time=None,
+                       label_record='Physical'
                 ):
 
         if isinstance(strategies_list, str):
@@ -75,6 +71,9 @@ class Xperiment:
         self.gate_errors = { exp: gate_error for exp in self.strategies_list }
         self.measurement_errors = { exp: measurement_error for exp in self.strategies_list }
         self.memory_functions = { exp: memory_error_function for exp in self.strategies_list }
+
+        self.sim_times = { exp: sim_time for exp in self.strategies_list}
+        self.label_records = { exp: label_record for exp in self.strategies_list}
         
         self.configurations = {
             exp : Configuration(
@@ -85,16 +84,297 @@ class Xperiment:
                 gate_error = self.gate_errors[exp], 
                 measurementError = self.measurement_errors[exp],
                 experiment = exp, # Record experiment set with experiment name
-                message = experiment
-                )
+                message = experiment,
+                sim_time = self.sim_times[exp],
+                label_record = self.label_records[exp]
+            )
         for exp in self.strategies_list }
 
         self.QuantumNetworks = {
             exp : QuantumNetwork(self.configurations[exp])
         for exp in self.strategies_list }
+        
+        self.process_graph = {}
 
-    def validate(self):
-        pass 
+    def validate(self, vis=False, get_table=False):
+        validate_table = []
+
+        exper_allGreen = 0
+        for exper in self.strategies_list:
+
+            topology =self.edges_info_exp[exper]
+            timeline = self.timelines[exper]
+            sim_time = self.sim_times[exper]
+            gate_error = self.gate_errors[exper]
+            measurement_error = self.measurement_errors[exper]
+            memory_error =self.memory_functions[exper]
+            nodes_info = {}
+            for node in self.nodes_info_exp[exper]:
+                if node not in ['numPhysicalBuffer', 'numInternalEncodingBuffer', 'numInternalDetectingBuffer', 'numInternalInterfaceBuffer']:
+                    nodes_info[node] = self.nodes_info_exp[exper][node]
+
+            # Detect dynamic nodes
+            Dynamic_flag = False
+            for node in nodes_info:
+                if callable(nodes_info[node]['coordinate']):
+                    Dynamic_flag = True
+
+            # Validate parameter
+            Parameters_test = {
+                'loss': True,
+                'depolarizing error': True,
+                'gate error': True,
+                'memory error': True,
+                'measurement error': True,
+            }
+
+            # loss and depolarizing_error
+            for edge in topology:
+                loss = topology[edge]['loss'] # dB/km
+                if type(loss) is not float and type(loss) is not int:
+                    Parameters_test['loss'] = False
+
+                p_dep = topology[edge]['function']
+                if type(p_dep) is list:
+                    if len(p_dep) != 4:
+                        print(f'[{exper}] length depolarizing probability of {edge} is not 4')
+                        Parameters_test['depolarizing error'] = False
+                    if int(round(sum(p_dep), 4)) != 1:
+                        print(f'[{exper}] WARNING sum of depolarizing probability of {edge} is not 1 to decimal 4.')
+
+            # gate_error
+            if gate_error > 1 or gate_error < 0:
+                print(f'[{exper}] WARNING gate error probability is not a valid value.')
+                Parameters_test['gate error'] = False
+
+            # memory_error
+            if callable(memory_error):
+                for i in range(10):
+                    x = random.random()
+                    p = memory_error(x)
+                    if len(p) != 4:
+                        print(f'[{exper}] length of memory error is not 4')
+                        Parameters_test['memory error'] = False
+                    if int(round(sum(p), 2)) != 1:
+                        print(f'[{exper}] WARNING sum of memory error probability of {edge} is not 1 to decimal 2.')
+            else:
+                print(f'[{exper}] WARNING memory error is not callable function')
+                if len(memory_error) != 4:
+                    print(f'[{exper}] length of memory error is not 4')
+                    Parameters_test['memory error'] = False
+            
+            # measurement_error
+            if measurement_error > 1:
+                print(f'[{exper}] measurement error provided is more than 1')
+                Parameters_test['measurement error'] = False
+
+            # Valiate Process-flow and number of resource
+
+            G = nx.Graph()
+            for edge in topology:
+                G.add_edge(edge[0], edge[1]) 
+            nx.set_edge_attributes(G, topology)
+
+            print('Limited Process: ')
+            limited_processes = []
+            for process in timeline:
+                if type(process['Num Trials'] )is int:
+                    limited_processes.append(process['Main Process'])
+
+                    if tuple(process['Edges']) == (list(G.nodes())[0], list(G.nodes())[-1]):
+                        is_end_to_end = f'End-to-end process -> {process["Edges"]}'
+                    else:
+                        is_end_to_end = f'Non-E2E process -> {process["Edges"]}'
+
+                    print(f'{len(limited_processes)}. ' ,process['Main Process'], f': {is_end_to_end}')
+            
+
+            if len(limited_processes) == 0:
+            # Detect no limited process simulation
+                print(f'[{exper}] experiment has no limited process...')
+
+                if sim_time is None:
+                    print(f'[{exper}] WARNING: simulation might not terminate')
+            
+            if sim_time is not None:
+                print(f'[{exper}] experiment will end with simulation time limit: {sim_time}s')
+
+            if Dynamic_flag:
+                print(f'[{exper}] experiment contains dynamic nodes...')
+                if sim_time is None:
+                    print(f'[{exper}] experiment will terminate only if limited process is finish, please make sure that loss and distance provided are reasonable as simulation might take insanely much time to finish...')
+
+            if nx.is_connected(G):
+                print('Topology provied is connected graph...')
+            else:
+                print('The topology provided is not connected, this might not be what is expected...')
+
+            # Validate if all edges have generate physical resource
+
+            num_gpr = 0
+            missing_process_edge = []
+            for edge in G.edges:
+                
+                for process in timeline:
+                    if process['Main Process'] in ['Generate physical Bell pair']:
+                        if tuple(process['Edges']) == edge:
+                            num_gpr += 1
+                        else:
+                            missing_process_edge.append(edge)
+
+            if num_gpr == len(G.edges):
+                print('All edges have Generate physical Bell pair process...') 
+            else:
+                print('Not all edge have Generate physical Bell pair process, the missing edges are, ')
+                for edge in missing_process_edge:
+                    print(edge)
+
+            # Create process graph, process -> node , label -> edge
+
+            modified_timeline = []
+            for process in timeline:
+                modified_process = {
+                    'node': f'{process["Main Process"]}\n{tuple(process["Edges"])}',
+                }
+                modified_process = {**modified_process, **process}
+                modified_timeline.append(modified_process)
+
+            timelineGraph = nx.DiGraph()
+
+            for node in modified_timeline:
+
+                label_out = node['Label out']
+
+                for next_node in modified_timeline:
+
+                    if len(next_node['Edges']) == 2:
+                    # Non-entanglement swapping process
+                        if next_node['Label in'] == label_out and node['Edges'][0] == next_node['Edges'][0] and node['Edges'][-1] == next_node['Edges'][-1]:
+                            timelineGraph.add_edge(node['node'], next_node['node'], label=label_out)
+                    
+                    else:
+                    # Entanglement swapping process
+                        if next_node['Label in'] == label_out and node['Edges'][0] in next_node['Edges'] and node['Edges'][-1] in next_node['Edges']:
+                            timelineGraph.add_edge(node['node'], next_node['node'], label=label_out)
+
+            # Check if limited process could reach all generate physical Bell pair with nodes.
+
+            def check_reachable(process, modified_timeline, timelineGraph):
+                reach_status = {}
+                for node in process['Edges']:
+                    reach_status[node] = False
+                    for to_process in modified_timeline:
+                        if to_process['Main Process'] in ['Generate physical Bell pair']:
+                            try:
+                                if nx.has_path(timelineGraph, to_process['node'], process['node']):
+                                    reach_status[node] = True
+                            except nx.NodeNotFound as e:
+                                print(f"{e}")
+                                return reach_status
+                return reach_status
+            
+            limitedProcessReachStatus = {}
+            for process in modified_timeline:
+                if type(process['Num Trials']) is int:
+                    
+                    reach_status = check_reachable(process, modified_timeline, timelineGraph)
+                    limitedProcessReachStatus[process['node']] = reach_status
+
+            allGreen = False
+            for limited_process in limitedProcessReachStatus:
+                reachable = 0
+                for node in limitedProcessReachStatus[limited_process]:
+                    if limitedProcessReachStatus[limited_process][node]:
+                        reachable += 1
+                        # print(f'{limited_process} could reach {node}')
+                    else:
+                        pass
+                        # print(f'{limited_process} could not reach {node}, this problem might coming from wrong node is specify to the process or/and label is not match.') 
+                if reachable == len(limitedProcessReachStatus[limited_process]):
+                    print(f'Limited process: {limited_process} is reachable to fundamental resource processes...')
+                    allGreen = True
+                else:
+                    print(f'Limited process: {limited_process} is not reachable to fundamental resource processes, this might cause an error')
+                    allGreen = False
+
+                if allGreen:
+                    pass
+                    # if purification check number of external qubits
+
+                    # if logical encoding check number of internal encoding qubits
+
+            if allGreen:
+                exper_allGreen += 1
+                print(f'[{exper}] all status checked ')
+            else:
+                print(f'Checking is not pass, please be patient and re-check [{exper}] again.')
+
+
+            net = Network( height='100%', width='100%', notebook=True) # notebook=True height='100%', width='100%'
+            # net.from_nx(timelineGraph)
+
+            # Code from https://gist.github.com/quadrismegistus/92a7fba479fc1e7d2661909d19d4ae7e
+            # for each node and its attributes in the networkx graph
+            for node, node_attrs in timelineGraph.nodes(data=True):
+                net.add_node(str(node), shape='box', **node_attrs)
+                
+            # for each edge and its attributes in the networkx graph
+            for source,target,edge_attrs in timelineGraph.edges(data=True):
+                # if value/width not specified directly, and weight is specified, set 'value' to 'weight'
+                if not 'value' in edge_attrs and not 'width' in edge_attrs and 'weight' in edge_attrs:
+                    # place at key 'value' the weight of the edge
+                    edge_attrs['value']=edge_attrs['weight']
+                # add the edge
+                net.add_edge(str(source),str(target),**edge_attrs)
+
+            net.set_options(
+                '''
+                var options = {
+                    "layout": {
+                        "hierarchical": {
+                        "enabled": true,
+                        "levelSeparation": 250,
+                        "direction": "LR",
+                        "sortMethod": "directed"
+                        }
+                    },
+                    "physics": {
+                        "hierarchicalRepulsion": {
+                        "centralGravity": 0
+                        },
+                        "minVelocity": 0.75,
+                        "solver": "hierarchicalRepulsion"
+                    }
+                }
+                '''
+            )
+            
+            # net.show_buttons(filter_=['layout', 'interaction', 'physics'])
+            self.process_graph[exper] = net
+            if vis:
+                net.show(f'{exper}-timeline.html')
+
+            validate_row = {
+                'Experiment': exper,
+                'Resource-reachable': 'PASSED' if allGreen else 'FAILED',
+            }
+            for parameter in Parameters_test:
+                validate_row[parameter] = 'PASSED' if Parameters_test[parameter] else 'FAILED'
+
+            validate_table.append(validate_row)
+
+        if get_table:
+            df = pd.DataFrame(validate_table)
+            dfStyler = df.style.set_properties(**{'text-align': 'left'})
+            dfStyler.set_table_styles([dict(selector='th', props=[('text-align', 'left')])])
+            return dfStyler
+
+        if exper_allGreen == len(self.experiments):
+            print('All timeline and topology of all experiments are validated, you are good to execute Experiment.run() command! \nAnother error that is not currently check is the number of qubits needed to completed the task.')
+            return True
+        else:
+            print('Test not passed.')
+            return False
 
     def execute(self, multithreading=False, save_result=False):
         
