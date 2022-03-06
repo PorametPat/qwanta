@@ -10,6 +10,7 @@ from tqdm.notebook import tqdm
 import matplotlib.pyplot as plt
 from pyvis.network import Network
 import random
+import numpy as np
 
 from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _VirtualStateTomography
 from .SubProcess import _TimeLag
