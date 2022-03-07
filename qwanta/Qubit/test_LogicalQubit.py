@@ -10,7 +10,7 @@ class TestLogicalQubit(unittest.TestCase):
     def setUp(self) -> None:
         self.env = VirtualSimpyEnvironment()
         self.memFunc = [1, 0, 0, 0]
-        self.gateError = [1, 0, 0, 0]
+        self.gateError = 0
         self.measurementError = 0
         PhysicalQubits = [PhysicalQubit('Damm', i, 'boy!', 'encoding_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError) for i in range(7)]
         self.logicalQubit = LogicalQubit('Damm', 'Steane', 'girl!', self.env)

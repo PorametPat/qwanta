@@ -11,7 +11,7 @@ class TestPhysicalQubit(unittest.TestCase):
     def setUp(self) -> None:
         self.env = VirtualSimpyEnvironment()
         self.memFunc = [1, 0, 0, 0]
-        self.gateError = [1, 0, 0, 0]
+        self.gateError = 0
         self.measurementError = 0
         self.qubit = PhysicalQubit('EndNode1', 0, 'EndNode1-EndNode2', 'test_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError)
         self.qubit.setInitialTime()
