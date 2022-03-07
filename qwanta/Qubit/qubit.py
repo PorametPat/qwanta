@@ -646,7 +646,7 @@ class PhysicalQubit:
             pass
 
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
             pass
         else:
             self.applySingleQubitGateError(prob=[0.25, 0.25, 0.25, 0.25])
@@ -664,7 +664,7 @@ class PhysicalQubit:
     def H_gate(self, gate_error=None):
         
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
             self.error_z, self.error_x = self.error_x, self.error_z
         else:
             self.applySingleQubitGateError(prob=[0.25, 0.25, 0.25, 0.25])
@@ -683,7 +683,7 @@ class PhysicalQubit:
     def X_gate(self, gate_error=None):
         
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
             self.error_x = not self.error_x
         else:
             self.applySingleQubitGateError(prob=[0.25, 0.25, 0.25, 0.25])
@@ -702,7 +702,7 @@ class PhysicalQubit:
     def Z_gate(self, gate_error=None):
         
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
             self.error_z = not self.error_z
         else:
             self.applySingleQubitGateError(prob=[0.25, 0.25, 0.25, 0.25])
@@ -721,7 +721,7 @@ class PhysicalQubit:
     def S_dagger_gate(self, gate_error=None):
 
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
             if self.error_x:
                 self.error_z = not self.error_z 
         else:
@@ -742,7 +742,7 @@ class PhysicalQubit:
     def S_gate(self, gate_error=None):
 
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
             if self.error_x:
                 self.error_z= not self.error_z
         else:
@@ -753,7 +753,7 @@ class PhysicalQubit:
     def CNOT_gate(self, control_qubit, gate_error=None):
         
         g_e = self.gate_error if gate_error is None else gate_error
-        if g_e < random.random():
+        if (1 - g_e) > random.random():
         
             if control_qubit.error_x:
                 self.error_x = not self.error_x
