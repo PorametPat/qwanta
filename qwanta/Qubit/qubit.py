@@ -636,6 +636,8 @@ class PhysicalQubit:
             results = self.measureY(get_operator=get_operator, measurement_error=measurement_error)
         elif basis in ['X', 'x']:
             results = self.measureX(get_operator=get_operator, measurement_error=measurement_error)
+        elif basis in ['I', 'i']:
+            results = True
 
         return results
 
