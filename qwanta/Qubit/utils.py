@@ -18,6 +18,128 @@ def GetQubit(memoryFunction=None, gate_error=None, measurementError=None):
     
     return q
 
+def GetQubit_experimental(gate_error=0, memory_function=[1, 0, 0, 0], measurement_error=0):
+
+    env = VirtualEnv()
+    q = Qubit(env, gate_error, memory_function, measurement_error)
+    q.setInitialTime()
+
+    return q
+
+class Qubit:
+
+    def __init__(self, env, gate_error=0, memory_function=[1, 0, 0, 0], measurement_error=0) -> None:
+        self.env = env 
+        self.memory_function = memory_function if callable(memory_function) else lambda t: memory_function
+        self.gate_error = gate_error
+        self.measurement_error = measurement_error
+        self.id = None
+
+        self.setFree()
+
+    def setFree(self):
+
+        # Noise flag
+        self.error_x = False
+        self.error_z = False
+        self.error_y = False
+        self.initiateTime = None
+        self.memoryProbVector = [1, 0, 0, 0]
+        self.memoryErrorRate = [1, 0, 0, 0]
+
+        self.isPurified = False
+        self.last_gate_time = None
+
+    def setInitialTime(self):
+        self.initiateTime = self.env.now
+        self.last_gate_time = self.initiateTime 
+        return None
+
+    def addXerror(self):
+        self.error_x = not self.error_x
+        return None
+
+    def addZerror(self):
+        self.error_z = not self.error_z
+        return None
+
+    def applySingleQubitError(self, prob):
+        error_choice = random.choices(['I', 'X', 'Z', 'Y'], weights=prob)[0]
+        if error_choice == 'I':
+            pass
+        elif error_choice == 'X':
+            self.addXerror()
+        elif error_choice == 'Z':
+            self.addZerror()
+        else:
+            self.addXerror()
+            self.addZerror()
+
+    def measure(self, basis, measurement_error=None):
+
+        # Apply memory error
+        self.applySingleQubitError(self.memory_function(self.env.now - self.initiateTime))
+
+        meas_error = self.measurementError if measurement_error is None else measurement_error
+        
+        if basis == 'X':
+            return not self.error_z if meas_error > random.random() else self.error_z
+
+        elif basis == 'Y':
+            error = True
+            if self.error_x and self.error_z:
+                error = False
+            if not self.error_x and not self.error_z:
+                error = False
+            
+            return not error if meas_error > random.random() else error
+
+        elif basis == 'Z':
+            return not self.error_x if meas_error > random.random() else self.error_x
+        
+        else:
+            raise ValueError(f'Measured basis is not implemented: {basis}')
+
+    def SingleQubitGate(self, instruc, gate_error=None):
+
+        g_e = self.gate_error if gate_error is None else gate_error
+
+        if (1 - g_e) > random.random():
+            if instruc in ['I', 'i']:
+                pass
+            elif instruc in ['H', 'h']:
+                self.error_z, self.error_x = self.error_x, self.error_z
+            elif instruc in ['X', 'x']:
+                self.error_x = not self.error_x
+            elif instruc in ['Z', 'z']:
+                self.error_z = not self.error_z
+            elif instruc in ['S', 's', 'Sdg', 'sdg']:
+                if self.error_x:
+                    self.error_z = not self.error_z 
+            else:
+                raise ValueError(f'Gate is not implemented: {instruc}')
+            
+        else:
+            self.applySingleQubitError(prob=[0.25, 0.25, 0.25, 0.25])
+
+        return None
+
+    def TwoQubitsGate(self, target_qubit, instruc, gate_error=None):
+        '''
+            Call signature control_qubit.TwoQubitGate(target_qubit)
+        '''
+        
+        g_e = self.gate_error if gate_error is None else gate_error
+        if (1 - g_e) > random.random():
+            if self.error_x:
+                target_qubit.error_x = not target_qubit.error_x
+            
+            if target_qubit.error_z:
+                self.error_z = not self.error_z
+        else:
+            self.applySingleQubitError(prob=[0.25, 0.25, 0.25, 0.25])
+            target_qubit.applySingleQubitError(prob=[0.25, 0.25, 0.25, 0.25])
+
 class VirtualEnv:
     """
     Create initialize information for physical qubit
