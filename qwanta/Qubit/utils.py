@@ -2,6 +2,8 @@ from .qubit import PhysicalQubit
 import random
 from sympy import Symbol
 import pandas as pd
+import tqdm
+import itertools
 
 def GetQubit(memoryFunction=None, gate_error=None, measurementError=None):
     
