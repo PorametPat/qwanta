@@ -292,7 +292,7 @@ class ProbablyQuantumCircuit:
         # with probability 1/2 apply gate to q_index
         var = Symbol(var) if isinstance(var, str) else var
         variation = ['No gate', 'None'] if var == 0 else ['No gate', 'None'] + self.Pauli1
-        self.update_instruction('c_if ' + gate, [cq_index, tq_index], var, ['No gate', 'None'] + self.Pauli1)
+        self.update_instruction('c_if ' + gate, [cq_index, tq_index], var, variation)
 
     def syndrome(self):
         pass
@@ -365,7 +365,7 @@ class ProbablyQuantumCircuit:
                 prob *= 1/2
                 if error != 'No gate':
                     if error == 'None':
-                        qubits[qubits_index[1]].SingleQubitGate(gate)
+                        qubits[qubits_index[1]].SingleQubitGate('i')
                         prob *= (1 - var)
                     else:
                         qubits[qubits_index[1]].SingleQubitGate(error)
@@ -399,7 +399,6 @@ class ProbablyQuantumCircuit:
             # Copy instruction
             instructions = self.instructions[:]
 
-
             for stab, qubit_index in zip(stabilizer, IndexStabilizer):
                 instructions.append({
                     'instruction': 'measure ' + stab,
@@ -410,6 +409,12 @@ class ProbablyQuantumCircuit:
 
             # Evalulate instruction
             variations = [instruc['variation'] for instruc in instructions]
+            """
+            all_ = 0
+            for _ in itertools.product(*variations):
+                all_ += 1
+            print(all_)
+            """
             for error in tqdm.tqdm(itertools.product(*variations), desc='Variations'):
                 measurement_readout, prob, is_commute = self.evalute(error, instructions, stabilizer, IndexStabilizer)
             
