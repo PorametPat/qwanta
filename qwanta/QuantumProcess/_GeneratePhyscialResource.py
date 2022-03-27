@@ -35,7 +35,7 @@ class Mixin:
         relative_distance = self.getDistance(node1, node2)
 
         # Calculate probability distribution from distance of given edge
-        prob = self.graph[node1][node2]['function'](relative_distance, self.env.now) if callable(self.graph[node1][node2]['function']) else self.graph[node1][node2]['function']
+        prob = self.graph[node1][node2]['depolarlizing error'](relative_distance, self.env.now) if callable(self.graph[node1][node2]['depolarlizing error']) else self.graph[node1][node2]['depolarlizing error']
 
         return prob
 

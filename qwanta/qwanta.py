@@ -142,7 +142,7 @@ class Xperiment:
                 if type(loss) is not float and type(loss) is not int:
                     Parameters_test['loss'] = False
 
-                p_dep = topology[edge]['function']
+                p_dep = topology[edge]['depolarlizing error']
                 if type(p_dep) is list:
                     if len(p_dep) != 4:
                         print(f'[{exper}] length depolarizing probability of {edge} is not 4')
@@ -586,7 +586,7 @@ class Experiment:
                 if type(loss) is not float and type(loss) is not int:
                     Parameters_test['loss'] = False
 
-                p_dep = topology[edge]['function']
+                p_dep = topology[edge]['depolarlizing error']
                 if type(p_dep) is list:
                     if len(p_dep) != 4:
                         print(f'[{exper}] length depolarizing probability of {edge} is not 4')
@@ -1026,13 +1026,25 @@ class Configuration:
         # Initialize graph
         G = nx.Graph()
         for edge in topology:
-            #time = topology[edge]['distance']/self.light_speed_in_fiber 
-            G.add_edge(edge[0], edge[1]) # , weight=time
+
+            if not callable(topology[edge]['memory function']):
+                memory_time = topology[edge]['memory function']
+                
+                # Memory error
+                def memory_error_function(time, tau=memory_time):
+                    p = (np.e**(-1*(time/tau)))/4 + 0.75
+                    return [p, (1- p)/3, (1- p)/3, (1- p)/3]
+
+                topology[edge]['memory function'] = memory_error_function
+
+            G.add_edge(edge[0], edge[1]) 
 
         nx.set_edge_attributes(G, topology)
+        
 
         # Include function of error model
         if nodes_info is not None:
+            nx.set_node_attributes(G, nodes_info)
             self.nodes_info = nodes_info
             self.numPhysicalBuffer = self.nodes_info['numPhysicalBuffer']
             self.numInternalEncodingBuffer = self.nodes_info['numInternalEncodingBuffer']
@@ -1078,12 +1090,13 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
              table : { f'{node1}-{node2}': {
                 f'QNICs-{node1}' : simpy.FilterStore(self.env),
                 f'QNICs-{node2}' : simpy.FilterStore(self.env)
-            } for node1, node2 in list(self.graph.edges()) }
+            } for node1, node2 in self.graph.edges() }
         for table in self.table_name}
 
         for table in self.table_name:
-            for node1, node2 in list(self.graph.edges()): # self.complete_graph.edges() #  
+            for node1, node2, attr in self.graph.edges(data=True): # self.complete_graph.edges() #  
                 for i in range(self.table_name[table]):
+                    # attr['memory function'] attr['gate error'] attr['measurement error']
                     self.QubitsTables[table][f'{node1}-{node2}'] \
                     [f'QNICs-{node1}'].put(PhysicalQubit(node1, i, f'{node1}-{node2}', table[:8], self.env, table, self.configuration.memFunc, self.configuration.gateError, self.configuration.measurementError))
                     self.QubitsTables[table][f'{node1}-{node2}'] \
@@ -1092,7 +1105,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         self.internalLogicalQubitTable = { f'{node1}-{node2}': {
             f'QNICs-{node1}' : [],
             f'QNICs-{node2}' : []
-        } for node1, node2 in list(self.graph.edges()) }
+        } for node1, node2 in self.graph.edges() }
 
         self.resource_table_name = [
             'physicalResourceTable', 
@@ -1105,7 +1118,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         self.resourceTables = {}
         for table in self.resource_table_name:
             self.resourceTables[table] = {}
-            for node1, node2 in list(self.complete_graph.edges()):
+            for node1, node2 in self.complete_graph.edges():
                 if table[:8] == 'internal':
                     self.resourceTables[table][f'{node1}-{node2}'] = {
                         f'{node1}' : simpy.FilterStore(self.env),
