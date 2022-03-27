@@ -93,6 +93,10 @@ class Xperiment:
         self.QuantumNetworks = {
             exp : QuantumNetwork(self.configurations[exp])
         for exp in self.strategies_list }
+
+        self.graphs = {
+            exp : self.configurations[exp].NetworkTopology
+        for exp in self.strategies_list}
         
         self.process_graph = {}
 
@@ -101,6 +105,9 @@ class Xperiment:
 
         exper_allGreen = 0
         for exper in self.strategies_list:
+
+            print(f'\nValidating experiment: {exper}')
+            print('---------------------------------------------')
 
             topology =self.edges_info_exp[exper]
             timeline = self.timelines[exper]
@@ -126,6 +133,7 @@ class Xperiment:
                 'gate error': True,
                 'memory error': True,
                 'measurement error': True,
+                'Network': 'Dynamic' if Dynamic_flag else 'Stationary'
             }
 
             # loss and depolarizing_error
@@ -139,8 +147,9 @@ class Xperiment:
                     if len(p_dep) != 4:
                         print(f'[{exper}] length depolarizing probability of {edge} is not 4')
                         Parameters_test['depolarizing error'] = False
-                    if int(round(sum(p_dep), 4)) != 1:
+                    if int(round(sum(np.abs(p_dep)), 4)) != 1:
                         print(f'[{exper}] WARNING sum of depolarizing probability of {edge} is not 1 to decimal 4.')
+                        Parameters_test['depolarizing error'] = False
 
             # gate_error
             if gate_error > 1 or gate_error < 0:
@@ -367,10 +376,13 @@ class Xperiment:
             df = pd.DataFrame(validate_table)
             dfStyler = df.style.set_properties(**{'text-align': 'left'})
             dfStyler.set_table_styles([dict(selector='th', props=[('text-align', 'left')])])
+            dfStyler.applymap(lambda v: "color:green;" if v == 'PASSED' else "")
+            dfStyler.applymap(lambda v: "color:red;" if v == 'FAILED' else "")
             return dfStyler
 
         if exper_allGreen == len(self.experiments):
-            print('All timeline and topology of all experiments are validated, you are good to execute Experiment.run() command! \nAnother error that is not currently check is the number of qubits needed to completed the task.')
+            print('All timeline and topology of all experiments are validated, you are good to execute Experiment.run() command!\
+                 \nAnother error that is not currently check is the number of qubits needed to completed the task.')
             return True
         else:
             print('Test not passed.')
@@ -579,8 +591,9 @@ class Experiment:
                     if len(p_dep) != 4:
                         print(f'[{exper}] length depolarizing probability of {edge} is not 4')
                         Parameters_test['depolarizing error'] = False
-                    if int(round(sum(p_dep), 4)) != 1:
+                    if int(round(np.abs(sum(p_dep)), 4)) != 1:
                         print(f'[{exper}] WARNING sum of depolarizing probability of {edge} is not 1 to decimal 4.')
+                        Parameters_test['depolarizing error'] = False
 
             # gate_error
             if len(gate_error) != 2:
