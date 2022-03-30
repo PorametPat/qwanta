@@ -555,8 +555,9 @@ class PhysicalQubit:
         return None
 
     def measureX(self, get_operator=False, measurement_error=None):
-        self.applyMemoryError2()
-        self.applySingleQubitGateError()
+        #self.applyMemoryError2()
+        # self.applySingleQubitGateError()
+        self.applySingleQubitGateError(self.memoryFunc(self.env.now - self.initiateTime))
 
         if get_operator:
             result = 0
@@ -577,8 +578,9 @@ class PhysicalQubit:
             return self.error_z # not
 
     def measureZ(self, get_operator=False, measurement_error=None):
-        self.applyMemoryError2()
-        self.applySingleQubitGateError()
+        # self.applyMemoryError2()
+        # self.applySingleQubitGateError()
+        self.applySingleQubitGateError(self.memoryFunc(self.env.now - self.initiateTime))
 
         if get_operator:
             result = 0
@@ -601,8 +603,10 @@ class PhysicalQubit:
 
     def measureY(self, get_operator=False, measurement_error=None):
 
-        self.applyMemoryError2()
-        self.applySingleQubitGateError()
+        #self.applyMemoryError2()
+        #self.applySingleQubitGateError()
+
+        self.applySingleQubitGateError(self.memoryFunc(self.env.now - self.initiateTime))
 
         error = True
         if self.error_x and self.error_z:

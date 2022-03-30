@@ -47,9 +47,13 @@ class Xperiment:
         self.strategies_list = list(self.timelines.keys())
 
         # Memory error
-        def memory_error_function(time, tau=memory_time):
-            p = (np.e**(-1*(time/tau)))/4 + 0.75
-            return [p, (1- p)/3, (1- p)/3, (1- p)/3]
+        if isinstance(memory_time, float) or isinstance(memory_time, int):
+            def memory_error_function(time, tau=memory_time):
+                p = 3*(np.e**(-1*(time/tau)))/4 + 0.25
+                return [p, (1- p)/3, (1- p)/3, (1- p)/3]
+            memory_function = memory_error_function
+        else:
+            memory_function = memory_time
 
         default_resources_dict = {
             'numPhysicalBuffer': 20,
@@ -70,7 +74,7 @@ class Xperiment:
 
         self.gate_errors = { exp: gate_error for exp in self.strategies_list }
         self.measurement_errors = { exp: measurement_error for exp in self.strategies_list }
-        self.memory_functions = { exp: memory_error_function for exp in self.strategies_list }
+        self.memory_functions = { exp: memory_function for exp in self.strategies_list }
 
         self.sim_times = { exp: sim_time for exp in self.strategies_list}
         self.label_records = { exp: label_record for exp in self.strategies_list}
@@ -83,8 +87,8 @@ class Xperiment:
                 memFunc = self.memory_functions[exp], 
                 gate_error = self.gate_errors[exp], 
                 measurementError = self.measurement_errors[exp],
-                experiment = exp, # Record experiment set with experiment name
-                message = experiment,
+                experiment = experiment, # Record experiment set with experiment name
+                message = exp,
                 sim_time = self.sim_times[exp],
                 label_record = self.label_records[exp]
             )
@@ -1008,7 +1012,7 @@ class Configuration:
         self.numInternalEncodingBuffer = 20
         self.numInternalDetectingBuffer = 10
         self.numInternalInterfaceBuffer = 2
-        self.memFunc = [1, 0, 0, 0] if memFunc is None else memFunc # Function of memory of qubit
+        self.memFunc = np.inf if memFunc is None else memFunc # Function of memory of qubit
         self.gateError = 0 if gate_error is None else gate_error
         self.measurementError = 0 if measurementError is None else measurementError
         self.timeline = timeline
@@ -1027,15 +1031,24 @@ class Configuration:
         G = nx.Graph()
         for edge in topology:
 
-            if not callable(topology[edge]['memory function']):
-                memory_time = topology[edge]['memory function']
-                
-                # Memory error
-                def memory_error_function(time, tau=memory_time):
-                    p = (np.e**(-1*(time/tau)))/4 + 0.75
-                    return [p, (1- p)/3, (1- p)/3, (1- p)/3]
+            for node in edge:
 
-                topology[edge]['memory function'] = memory_error_function
+                if node not in topology.keys():
+                    topology[edge][node] = {
+                        'memory function': self.memFunc,
+                        'gate error': self.gateError,
+                        'measurement error': self.measurementError
+                    }
+
+                if not callable(topology[edge][node]['memory function']):
+                    memory_time = topology[edge][node]['memory function']
+                    
+                    # Memory error
+                    def memory_error_function(time, tau=memory_time):
+                        p = (np.e**(-1*(time/tau)))/4 + 0.75
+                        return [p, (1- p)/3, (1- p)/3, (1- p)/3]
+
+                    topology[edge][node]['memory function'] = memory_error_function
 
             G.add_edge(edge[0], edge[1]) 
 
@@ -1096,11 +1109,11 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         for table in self.table_name:
             for node1, node2, attr in self.graph.edges(data=True): # self.complete_graph.edges() #  
                 for i in range(self.table_name[table]):
-                    # attr['memory function'] attr['gate error'] attr['measurement error']
+
                     self.QubitsTables[table][f'{node1}-{node2}'] \
-                    [f'QNICs-{node1}'].put(PhysicalQubit(node1, i, f'{node1}-{node2}', table[:8], self.env, table, self.configuration.memFunc, self.configuration.gateError, self.configuration.measurementError))
+                    [f'QNICs-{node1}'].put(PhysicalQubit(node1, i, f'{node1}-{node2}', table[:8], self.env, table, attr[node1]['memory function'], attr[node1]['gate error'], attr[node1]['measurement error']))
                     self.QubitsTables[table][f'{node1}-{node2}'] \
-                    [f'QNICs-{node2}'].put(PhysicalQubit(node2, i, f'{node1}-{node2}', table[:8], self.env, table, self.configuration.memFunc, self.configuration.gateError, self.configuration.measurementError))
+                    [f'QNICs-{node2}'].put(PhysicalQubit(node2, i, f'{node1}-{node2}', table[:8], self.env, table, attr[node2]['memory function'], attr[node2]['gate error'], attr[node2]['measurement error']))
 
         self.internalLogicalQubitTable = { f'{node1}-{node2}': {
             f'QNICs-{node1}' : [],
