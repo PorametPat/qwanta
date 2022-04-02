@@ -1047,7 +1047,7 @@ class Configuration:
                     
                     # Memory error
                     def memory_error_function(time, tau=memory_time):
-                        p = (np.e**(-1*(time/tau)))/4 + 0.75
+                        p = 0.75*np.e**(-1*(time/tau)) + 0.25
                         return [p, (1- p)/3, (1- p)/3, (1- p)/3]
 
                     topology[edge][node]['memory function'] = memory_error_function
