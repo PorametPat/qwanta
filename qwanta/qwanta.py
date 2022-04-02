@@ -323,10 +323,10 @@ class Xperiment:
                 print(f'Checking is not pass, please be patient and re-check [{exper}] again.')
 
 
-            net = Network( height='100%', width='100%', notebook=True) # notebook=True height='100%', width='100%'
-            # net.from_nx(timelineGraph)
+            net = Network( height='100%', width='100%', notebook=True) 
 
-            # Code from https://gist.github.com/quadrismegistus/92a7fba479fc1e7d2661909d19d4ae7e
+
+            # Code modified from https://gist.github.com/quadrismegistus/92a7fba479fc1e7d2661909d19d4ae7e
             # for each node and its attributes in the networkx graph
             for node, node_attrs in timelineGraph.nodes(data=True):
                 net.add_node(str(node), shape='box', **node_attrs)
@@ -339,6 +339,8 @@ class Xperiment:
                     edge_attrs['value']=edge_attrs['weight']
                 # add the edge
                 net.add_edge(str(source),str(target),**edge_attrs)
+
+            # End modified code
 
             net.set_options(
                 '''
@@ -769,10 +771,9 @@ class Experiment:
                 print(f'Checking is not pass, please be patient and re-check [{exper}] again.')
 
 
-            net = Network( height='100%', width='100%', notebook=True) # notebook=True height='100%', width='100%'
-            # net.from_nx(timelineGraph)
+            net = Network( height='100%', width='100%', notebook=True)
 
-            # Code from https://gist.github.com/quadrismegistus/92a7fba479fc1e7d2661909d19d4ae7e
+            # Code modified from https://gist.github.com/quadrismegistus/92a7fba479fc1e7d2661909d19d4ae7e
             # for each node and its attributes in the networkx graph
             for node, node_attrs in timelineGraph.nodes(data=True):
                 net.add_node(str(node), shape='box', **node_attrs)
@@ -786,6 +787,7 @@ class Experiment:
                 # add the edge
                 net.add_edge(str(source),str(target),**edge_attrs)
 
+            # End modified code
             net.set_options(
                 '''
                 var options = {
