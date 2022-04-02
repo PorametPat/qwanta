@@ -412,6 +412,59 @@ class Xperiment:
 
         return results
 
+class Tuner:
+
+    def __init__(self, strategies):
+
+        from bayes_opt import BayesianOptimization
+
+        self.optimizers = {
+            exp: BayesianOptimization(
+                strategies[exp]['objective_function'],
+                strategies[exp]['bounds'],
+                verbose=0
+            )
+        for exp in strategies}
+
+    def DistributedTuning(self, n_iter, path):
+
+        import ray
+
+        ray.init()
+
+        @ray.remote
+        def execute(optimizer, n_iter):
+            self.optimizers[optimizer].maximize(n_iter=n_iter)
+            data_tmp = []
+            for res_dict in self.optimizers[optimizer].res:
+                tmp = {param: res_dict['params'][param] for param in res_dict['params']}
+                tmp['objective'] = res_dict['target']
+                tmp['experiment'] = optimizer
+                data_tmp.append(tmp)
+            return data_tmp
+
+        results = ray.get([execute.remote(optimizer, n_iter) for optimizer in self.optimizers])
+        results = [item for sublist in results for item in sublist]
+        results = pd.DataFrame(results)
+        results.to_csv(path)
+
+        return True
+
+    def save_results(self, path):
+
+        data = []
+        for optimizer in self.optimizers:
+            data_tmp = []
+            for res_dict in self.optimizers[optimizer].res:
+                tmp = {param: res_dict['params'][param] for param in res_dict['params']}
+                tmp['objective'] = res_dict['target']
+                tmp['experiment'] = optimizer
+                data_tmp.append(tmp)
+            data += data_tmp
+
+        pd.DataFrame(data).to_csv(path)
+        return pd.DataFrame(data)
+
 class Experiment:
     def __init__(self, topologies, timelines, nodes_info=None, memFunc=None, gateError=None, simTime=None, measurementError=None,
                  parameters_set=None, label_records=None, BSA_prob=None,
