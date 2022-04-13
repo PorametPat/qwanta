@@ -46,7 +46,7 @@ def execute(parameter):
     for i in range(num_hops)}
 
     exps = Xperiment(
-        timelines_path = f'exper_id6_AppicationAnalysis_{num_hops}hops.xlsx',
+        timelines_path = f'exper_id6_selectedStats_{num_hops}hops.xlsx',
         nodes_info_exp = node_info,
         edges_info_exp = edge_info,
         gate_error = gate_error,
