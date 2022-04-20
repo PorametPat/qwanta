@@ -17,8 +17,8 @@ class Mixin:
         self.updateLog({'Time': self.env.now, 'Message': f'Process RuleSet of {initiator} and {responder}'})
 
         # Initialize value for throughtput
-        self.numResrouceProduced = 0
-        self.connectionSetupTimeStamp = self.env.now
+        # self.numResrouceProduced = 0
+        # self.connectionSetupTimeStamp = self.env.now
 
     def classicalCommunication(self, source, destination, factor=1):
         # Calculate time from distance, in this case simply using edges as a traveling time 
