@@ -386,7 +386,7 @@ class Xperiment:
             dfStyler.applymap(lambda v: "color:red;" if v == 'FAILED' else "")
             return dfStyler
 
-        if exper_allGreen == len(self.experiments):
+        if exper_allGreen == len(self.strategies_list):
             print('All timeline and topology of all experiments are validated, you are good to execute Experiment.run() command!\
                  \nAnother error that is not currently check is the number of qubits needed to completed the task.')
             return True
@@ -1151,7 +1151,6 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         self.qubitsLog = []
         self.numResrouceProduced = 0
         self.numBaseBellAttempt = 0
-        self.connectionSetupTimeStamp = 0
         
         # For fidelity calculation
         self.measurementResult = []
