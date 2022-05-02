@@ -1341,7 +1341,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         config = {data: self.configuration.__dict__[data] for data in self.configuration.__dict__}
         config['fidelity'] = self.fidelityStabilizerMeasurement
         config['Resources Produced'] = self.numResrouceProduced
-        config['Base Resources Produced'] = self.numBaseBellAttempt
+        config['Base Resources Attempt'] = self.numBaseBellAttempt
         config['Time used'] = self.connectionSetupTimeStamp
         config['Fidelity History'] = self.fidelityHistory
         config['Qubits waiting time'] = self.qubitsLog
