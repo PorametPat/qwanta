@@ -159,6 +159,10 @@ class Mixin:
         if protocol == 'Ss-Dp':
             # Request 3 Bell pairs
 
+            # Sort Bell pair in timely order
+            if False:
+                pass
+
             # Purify first pair with second and third
             # X purification
             Bells[1][0].CNOT_gate(Bells[0][0])
