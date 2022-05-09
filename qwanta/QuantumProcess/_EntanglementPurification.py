@@ -108,7 +108,7 @@ class Mixin:
             if num_required is not True:
                 isSuccess += 1 
 
-    def PrototypePurification(self, process, node1, node2, num_required=1, label_in='Physical', label_out='Purified',protocol='Ss-Dp'):
+    def PrototypePurification(self, process, node1, node2, num_required=1, label_in='Physical', label_out='Purified',protocol='Ss-Dp', note=None):
 
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
@@ -148,20 +148,21 @@ class Mixin:
                     bell = yield event.events[i]
                     Bells.append(bell)
 
-            info = (protocol, Bells, node1, node2, table, label_out, num_required, process)
+            info = (protocol, Bells, node1, node2, table, label_out, num_required, process, note)
             self.env.process(self._independentPurification(info))
 
 
     def _independentPurification(self, info):
 
-        protocol, Bells, node1, node2, table, label_out, num_required, process = info
+        protocol, Bells, node1, node2, table, label_out, num_required, process, note = info
+
+        # Sort Bell pair in timely order
+        if note == 'Sorted':
+            Bells.sort(key=lambda pair: pair[0].initiateTime if pair[0].initiateTime <= pair[1].initiateTime else pair[1].initiateTime)
+            
 
         if protocol == 'Ss-Dp':
             # Request 3 Bell pairs
-
-            # Sort Bell pair in timely order
-            if False:
-                pass
 
             # Purify first pair with second and third
             # X purification

@@ -1299,7 +1299,8 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                                                        num_required=process['Num Trials'], \
                                                        label_in=process['Label in'], \
                                                        label_out=process['Label out'], \
-                                                       protocol=process['Protocol']))]   
+                                                       protocol=process['Protocol'],
+                                                       note=process['Note']))]   
             elif process['Main Process'] in ['PrototypeGenerateLogicalResource', 'Generate logical Bell pair']:
                 p = [self.env.process(self.PrototypeGenerateLogicalResource(process, process['Edges'][0], process['Edges'][1], 
                                                                   num_required=process['Num Trials'], \
