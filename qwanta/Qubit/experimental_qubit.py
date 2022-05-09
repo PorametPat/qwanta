@@ -1,7 +1,7 @@
 import numpy as np 
 import random
 
-class PercectCodeLogicalQubit:
+class PerfectCodeLogicalQubit:
 
     def __init__(self, node1, qubitID, qnic, env, code='5QPC'):
         # Simulation setup
@@ -782,12 +782,12 @@ class LogicalQubit:
 
 class PhysicalQubit:
 
-    def __init__(self, node1, qubitID, qnic, role, env, table, memFunc, gate_error, measurementError):
+    def __init__(self, node1, qubitID, qnic, role, env, table, memFunc, gate_error, measurementError, mem_model=False):
         # Simulation setup
         self.env = env
         self.table = table
         self.memoryFunc = memFunc if callable(memFunc) else lambda t: memFunc
-        self.mem_model = False
+        self.mem_model = mem_model
         self.gate_error = gate_error # Do and Dont
         self.measurementError = measurementError
         self.photonPair = None
