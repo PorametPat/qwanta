@@ -1190,12 +1190,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         resource_table[f'{node1}-{node2}'].put((resource1, resource2, label))
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
 
-        #if label == 'Physical': #self.configuration.label_recorded:
-        #    self.numBaseBellAttempt += 1
-        
-        if (node1 and node2 in self.configuration.throughtputEdges) and label == self.configuration.label_recorded:
-            #print(f'Resource created at {node1}-{node2}')
-            # Record
+        if (node1 in self.configuration.throughtputEdges) and (node2 in self.configuration.throughtputEdges) and (label == self.configuration.label_recorded):
             self.numResrouceProduced += 1
 
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
