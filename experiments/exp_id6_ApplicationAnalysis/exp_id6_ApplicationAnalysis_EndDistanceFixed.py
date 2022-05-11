@@ -56,10 +56,10 @@ def execute(parameter, distance, message_log):
 
     if exps.validate():
         exps.execute(save_result=True)
+        return True
     else:
         raise ValueError('Validation failed')
 
-    return True
 
 loss_list =  np.array([0.3])
 p_dep_list = np.array([0.025])
@@ -68,8 +68,8 @@ mem_error_list = np.array([0.01])
 measurement_error_list =  np.array([0, 0.0025, 0.005, 0.0075, 0.01])
 number_of_hops_list = np.array([2, 4, 8]) 
 num_trajectories = 10
-exp_names = ['0G', 'E2E-1G-Ss-Dp', '1G-Ss-Dp', '1-2G-DirectedEncoded', 'HG-END2ENDPurifiedEncoded']
-message_log = 'exp_id6_ApplicationAnalysis'
+exp_names = ['0G', 'E2E-1G-Ss-Dp', '1G-Ss-Dp', '1-2G-DirectedEncoded', 'HG-END2ENDPurifiedEncoded', '2G-NonLocalCNOT']
+message_log = 'exp_id6_ApplicationAnalysis_EndDistanceFixed'
 distance = 100
 
 parameters_set = []; index = 0
@@ -133,5 +133,5 @@ for hops in number_of_hops_list:
                         index += 1
 
 DataFrame = pd.DataFrame(parameters_set)
-DataFrame.to_csv('exp_id6_ApplicationAnalysis_Extracted_Data.csv', index=False)
+DataFrame.to_csv('exp_id6_ApplicationAnalysis_EndDistanceFixed_Extracted_Data.csv', index=False)
 
