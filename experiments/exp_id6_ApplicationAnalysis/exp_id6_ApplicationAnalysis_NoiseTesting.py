@@ -111,6 +111,9 @@ for hops in number_of_hops_list:
                                 with open(f"result/Result_{message_log}_p{index}_r{trajectory}_{exp_name}.pkl", "rb") as f:
                                     exp = dill.load(f)
               
+                                Node_left = exp['throughtputEdges'][0]
+                                Node_right = exp['throughtputEdges'][1]
+
                                 data = {
                                     'index': index,
                                     'loss rate': loss, 
@@ -124,8 +127,12 @@ for hops in number_of_hops_list:
                                     'number of hops': hops,
                                     'fidelity': exp['fidelity'],
                                     'total time': exp['Time used'],
+
+                                    'fidelity estimation time': exp['Fidelity Estimation Time'],
+                                    'fidelity estimated edges': f"{Node_left}, {Node_right}",
+                                    'label resource produced': exp['Resources Produced'][f'{Node_left}-{Node_right}']['k'],
+
                                     'base Bell pairs attempted': exp['Base Resources Attempt'],
-                                    'label resource produced': exp['Resources Produced'],
                                     'distance': distance
                                 }
                                 parameters_set.append(data)
