@@ -77,7 +77,13 @@ class Xperiment:
         self.memory_functions = { exp: memory_function for exp in self.strategies_list }
 
         self.sim_times = { exp: sim_time for exp in self.strategies_list}
-        self.label_records = { exp: label_record for exp in self.strategies_list}
+
+        self.label_records = {}
+        for exp in self.strategies_list:
+            label_record = []
+            for process in self.timelines[exp]:
+                label_record.append(process['Label out'])
+            self.label_records[exp] = list(set(label_record))
         
         self.configurations = {
             exp : Configuration(
@@ -1149,7 +1155,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
 
         self.simulationLog = [] # <= TODO use this to collect data to plot
         self.qubitsLog = []
-        self.numResrouceProduced = 0
+        self.numResrouceProduced = {}
         self.numBaseBellAttempt = 0
         self.numResourceUsedForFidelityEstimation = 0
         
@@ -1191,8 +1197,11 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         resource_table[f'{node1}-{node2}'].put((resource1, resource2, label))
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
 
-        if (label == self.configuration.label_recorded):
-            self.numResrouceProduced += 1
+        if label in self.configuration.label_recorded:
+            if label not in self.numResrouceProduced:
+                self.numResrouceProduced[label] = 1
+            else:
+                self.numResrouceProduced[label] += 1
 
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
 

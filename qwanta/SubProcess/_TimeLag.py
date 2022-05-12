@@ -16,8 +16,7 @@ class Mixin:
         yield self.env.process(self.classicalCommunication(responder, initiator))
         self.updateLog({'Time': self.env.now, 'Message': f'Process RuleSet of {initiator} and {responder}'})
 
-        # Initialize value for throughtput
-        self.numResrouceProduced = 0
+        # Initialize time stamp after connection setup
         self.connectionSetupTimeStamp = self.env.now
 
     def classicalCommunication(self, source, destination, factor=1):
