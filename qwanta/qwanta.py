@@ -1151,6 +1151,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         self.qubitsLog = []
         self.numResrouceProduced = 0
         self.numBaseBellAttempt = 0
+        self.numResourceUsedForFidelityEstimation = 0
         
         # For fidelity calculation
         self.measurementResult = []
@@ -1338,6 +1339,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         config['fidelity'] = self.fidelityStabilizerMeasurement
         config['Resources Produced'] = self.numResrouceProduced
         config['Base Resources Attempt'] = self.numBaseBellAttempt
+        config['Resource Used in Fidelity Estimation'] = self.numResourceUsedForFidelityEstimation
         config['Time used'] = self.connectionSetupTimeStamp
         config['Fidelity History'] = self.fidelityHistory
         config['Qubits waiting time'] = self.qubitsLog

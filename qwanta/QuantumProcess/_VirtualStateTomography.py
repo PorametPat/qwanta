@@ -207,6 +207,7 @@ class Mixin:
             else:
                 self.Expectation_value['XX']['anti-commute'] += 1
 
+            self.numResourceUsedForFidelityEstimation += 1
             # Get error operator of each qubit 
             self.measurementResult.append({'qubit1': result_1_ST, 'qubit2': result_2_ST})  
             
@@ -220,6 +221,7 @@ class Mixin:
             else:
                 self.Expectation_value['YY']['anti-commute'] += 1
 
+            self.numResourceUsedForFidelityEstimation += 1
             # Get error operator of each qubit 
             self.measurementResult.append({'qubit1': result_1_ST, 'qubit2': result_2_ST})  
 
@@ -232,6 +234,7 @@ class Mixin:
             else:
                 self.Expectation_value['ZZ']['anti-commute'] += 1
 
+            self.numResourceUsedForFidelityEstimation += 1
             # Get error operator of each qubit 
             self.measurementResult.append({'qubit1': result_1_ST, 'qubit2': result_2_ST})  
  
