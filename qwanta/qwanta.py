@@ -1185,12 +1185,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         resource1.isBusy, resource2.isBusy = True, True
         resource1.partner, resource2.partner = resource2, resource1
         resource1.partnerID, resource2.partnerID = resource2.qubitID, resource1.qubitID
-        '''
-        if initial == True:
-            if resource1.initiateTime is not None or resource2.initiateTime is not None:
-                raise ValueError('This qubit has not set free properly')
-            resource1.initiateTime, resource2.initiateTime = self.env.now, self.env.now
-        '''
+
         if label == 'Internal':
             resource1.setInitialTime()
             resource2.setInitialTime()
