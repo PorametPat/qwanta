@@ -1154,6 +1154,9 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
 
         self.simulationLog = [] # <= TODO use this to collect data to plot
         self.qubitsLog = []
+        self.numResrouceProduced = {
+            f'{node1}-{node2}' : {}
+        for node1, node2 in self.complete_graph.edges()}
         self.numResrouceProduced = {}
         self.numBaseBellAttempt = 0
         self.numResourceUsedForFidelityEstimation = 0
@@ -1197,10 +1200,13 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
 
         if label in self.configuration.label_recorded:
-            if label not in self.numResrouceProduced:
-                self.numResrouceProduced[label] = 1
+            if f'{node1}-{node2}' not in self.numResrouceProduced:
+                self.numResrouceProduced[f'{node1}-{node2}'] = {label: 1}
             else:
-                self.numResrouceProduced[label] += 1
+                if label not in self.numResrouceProduced[f'{node1}-{node2}']:
+                    self.numResrouceProduced[f'{node1}-{node2}'][label] = 1
+                else:
+                    self.numResrouceProduced[f'{node1}-{node2}'][label] += 1
 
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
 
