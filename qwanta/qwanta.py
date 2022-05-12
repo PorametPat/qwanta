@@ -28,7 +28,6 @@ class Xperiment:
                        resources_dict=None,
                        experiment=None,
                        sim_time=None,
-                       label_record='Physical'
                 ):
 
         if isinstance(strategies_list, str):
@@ -1013,7 +1012,7 @@ class Experiment:
 
 class Configuration:
     def __init__(self, topology, timeline, experiment=False, nodes_info=None, memFunc=None, gate_error=None, measurementError=None,
-                 message=None, throughtput_edges=None, label_record='Physical', num_measured=9000, sim_time=None, 
+                 message=None, throughtput_edges=None, label_record=None, num_measured=9000, sim_time=None, 
                  collectFidelityHistory=False, result_path='result'):
 
         self.numPhysicalBuffer = 20
