@@ -50,8 +50,7 @@ def execute(parameter, distance, message_log):
         gate_error = gate_error,
         measurement_error = measurement_error,
         memory_time = memory_time,
-        experiment = f'{message_log}_p{index}_r{repeat_th}',
-        label_record='Physical'
+        experiment = f'{message_log}_p{index}_r{repeat_th}'
     )
 
     if exps.validate():
