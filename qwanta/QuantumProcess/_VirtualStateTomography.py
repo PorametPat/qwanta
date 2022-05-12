@@ -264,6 +264,9 @@ class Mixin:
             normalize_ZZ = (self.Expectation_value['ZZ']['commute'] - self.Expectation_value['ZZ']['anti-commute'])/(self.Expectation_value['ZZ']['commute'] + self.Expectation_value['ZZ']['anti-commute'])
             self.fidelityStabilizerMeasurement = (0.25)*(1 + normalize_XX + normalize_YY + normalize_ZZ)
 
+            if (self.numResourceUsedForFidelityEstimation == process['isSuccess']):
+                self.FidelityEstimationTimeStamp = self.env.now - self.FidelityEstimationTimeStamp
+
         if self.configuration.collectFidelityHistory:
             # Collect fidelity history
             norm_XX = self.Expectation_value['XX']['commute'] + self.Expectation_value['XX']['anti-commute']

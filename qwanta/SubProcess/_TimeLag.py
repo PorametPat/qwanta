@@ -18,6 +18,7 @@ class Mixin:
 
         # Initialize time stamp after connection setup
         self.connectionSetupTimeStamp = self.env.now
+        self.FidelityEstimationTimeStamp = self.env.now
 
     def classicalCommunication(self, source, destination, factor=1):
         # Calculate time from distance, in this case simply using edges as a traveling time 
