@@ -68,7 +68,7 @@ measurement_error_list =  np.array([0, 0.0025, 0.005, 0.0075, 0.01])
 number_of_hops_list = np.array([2, 4, 8]) 
 num_trajectories = 10
 exp_names = ['0G', 'E2E-1G-Ss-Dp', '1G-Ss-Dp', '1-2G-DirectedEncoded', 'HG-END2ENDPurifiedEncoded', '2G-NonLocalCNOT']
-message_log = 'exp_id6_ApplicationAnalysis_EndDistanceFixed'
+message_log = 'exp_id6_ApplicationAnalysis_EndDistanceFixed_modified_result_extraction'
 distance = 100
 
 parameters_set = []; index = 0
@@ -97,46 +97,46 @@ start_time = time.time()
 results = ray.get([execute.remote(i, distance, message_log) for i in parameters_set[start_parameter_index:]])
 print('Simulated Time: ', time.time() - start_time)
 
-parameters_set = []; index = 0
-for hops in number_of_hops_list:
-    for loss in loss_list:
-        for p_dep in p_dep_list:
-            for gate_error in gate_error_list:
-                for mem_error in mem_error_list:
-                    for measure_error in measurement_error_list:
-                        for exp_name in exp_names:
-                            for trajectory in range(num_trajectories):
-                                
-                                # Read file 
-                                with open(f"result/Result_{message_log}_p{index}_r{trajectory}_{exp_name}.pkl", "rb") as f:
-                                    exp = dill.load(f)
-              
-                                Node_left = exp['throughtputEdges'][0]
-                                Node_right = exp['throughtputEdges'][1]
+data_set = []
 
-                                data = {
-                                    'index': index,
-                                    'loss rate': loss, 
-                                    'depolarizing rate': p_dep, 
-                                    'gate error rate': gate_error, 
-                                    'memory error': mem_error,
-                                    'measurement error': measure_error,
-                                    'trajectory': trajectory,
-                                    'experiment': exp_name,
-                                    'number of hops': hops,
-                                    'fidelity': exp['fidelity'],
-                                    'total time': exp['Time used'],
+for params_set in parameters_set:
+    for exp_name in exp_names:
+        
+        index = params_set['index']
+        loss = params_set['loss rate']
+        p_dep = params_set['depolarizing rate']
+        gate_error = params_set['gate error rate']
+        mem_error = params_set['mem_error']
+        measure_error = params_set['measurement error']
+        hops = params_set['number of hops']
+        trajectory = params_set['trajectory']
 
-                                    'fidelity estimation time': exp['Fidelity Estimation Time'],
-                                    'fidelity estimated edges': f"{Node_left}, {Node_right}",
-                                    'label resource produced': exp['Resources Produced'][f'{Node_left}-{Node_right}']['k'],
+        # Read file 
+        with open(f"result/Result_{message_log}_p{index}_r{trajectory}_{exp_name}.pkl", "rb") as f:
+            exp = dill.load(f)
 
-                                    'base Bell pairs attempted': exp['Base Resources Attempt'],
-                                    'distance': distance
-                                }
-                                parameters_set.append(data)
-                        index += 1
+        Node_left = exp['throughtputEdges'][0]
+        Node_right = exp['throughtputEdges'][1]
 
-DataFrame = pd.DataFrame(parameters_set)
-DataFrame.to_csv('exp_id6_ApplicationAnalysis_EndDistanceFixed_Extracted_Data.csv', index=False)
+        data = {
+            'index': index,
+            'loss rate': loss, 
+            'depolarizing rate': p_dep, 
+            'gate error rate': gate_error, 
+            'memory error': mem_error,
+            'measurement error': measure_error,
+            'number of hops': hops,
+            'trajectory': trajectory,
+            'experiment': exp_name,
+            'fidelity': exp['fidelity'],
+            'total time': exp['Time used'],
+            'fidelity estimation time': exp['Fidelity Estimation Time'],
+            'fidelity estimated edges': f"{Node_left}, {Node_right}",
+            'label resource produced': exp['Resources Produced'][f'{Node_left}-{Node_right}']['k'],
+            'base Bell pairs attempted': exp['Base Resources Attempt'],
+            'distance': distance
+        }
+        data_set.append(data)
 
+DataFrame = pd.DataFrame(data_set)
+DataFrame.to_csv('exp_id6_ApplicationAnalysis_EndDistanceFixed_Extracted_Data_modified.csv', index=False)
