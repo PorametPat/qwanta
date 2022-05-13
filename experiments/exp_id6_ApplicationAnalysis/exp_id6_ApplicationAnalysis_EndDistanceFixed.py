@@ -22,7 +22,7 @@ def execute(parameter, distance, message_log):
     num_hops = parameter['number of hops']
     num_nodes = num_hops + 1
 
-    node_info = {f'Node {i}': {'coordinate': (int(dis), 0, 0)} for i, dis in enumerate(np.linspace(0, distance, num_nodes))}
+    node_info = {f'Node {i}': {'coordinate': (dis, 0, 0)} for i, dis in enumerate(np.linspace(0, distance, num_nodes))}
     edge_info = {
         (f'Node {i}', f'Node {i+1}'): {
         'connection-type': 'Space',
