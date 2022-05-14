@@ -1350,6 +1350,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         config['Fidelity Estimation Time'] = self.FidelityEstimationTimeStamp
         config['Fidelity History'] = self.fidelityHistory
         config['Qubits waiting time'] = self.qubitsLog
+        config['Commutation inforamtion'] = self.Expectation_value
 
         # Save log data
         config['Simulation log'] = self.simulationLog
