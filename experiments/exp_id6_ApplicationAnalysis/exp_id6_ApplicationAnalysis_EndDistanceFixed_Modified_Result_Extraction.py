@@ -134,7 +134,13 @@ for params_set in parameters_set:
             'fidelity estimated edges': f"{Node_left}, {Node_right}",
             'label resource produced': exp['Resources Produced'][f'{Node_left}-{Node_right}']['k'],
             'base Bell pairs attempted': exp['Base Resources Attempt'],
-            'distance': distance
+            'distance': distance,
+            'XX commute': exp['Commutation inforamtion']['XX']['commute'],
+            'XX anti-commute': exp['Commutation inforamtion']['XX']['anit-commute'],
+            'YY commute': exp['Commutation inforamtion']['YY']['commute'],
+            'YY anti-commute': exp['Commutation inforamtion']['YY']['anit-commute'],
+            'ZZ commute': exp['Commutation inforamtion']['ZZ']['commute'],
+            'ZZ anti-commute': exp['Commutation inforamtion']['ZZ']['anit-commute'],
         }
         data_set.append(data)
 
