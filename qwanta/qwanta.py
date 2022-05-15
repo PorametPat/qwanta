@@ -1040,7 +1040,7 @@ class Configuration:
 
             for node in edge:
 
-                if node not in topology.keys():
+                if node not in topology[edge].keys():
                     topology[edge][node] = {
                         'memory function': self.memFunc,
                         'gate error': self.gateError,
