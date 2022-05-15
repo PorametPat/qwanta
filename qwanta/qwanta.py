@@ -1118,9 +1118,27 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                 for i in range(self.table_name[table]):
 
                     self.QubitsTables[table][f'{node1}-{node2}'] \
-                    [f'QNICs-{node1}'].put(PhysicalQubit(node1, i, f'{node1}-{node2}', table[:8], self.env, table, attr[node1]['memory function'], attr[node1]['gate error'], attr[node1]['measurement error']))
+                    [f'QNICs-{node1}'].put(PhysicalQubit(node1=node1, 
+                                                         node2=node2, 
+                                                         qubitID=i, 
+                                                         qnic=f'{node1}-{node2}', 
+                                                         role=table[:8], 
+                                                         env=self.env, 
+                                                         table=table, 
+                                                         memFunc=attr[node1]['memory function'], 
+                                                         gate_error=attr[node1]['gate error'], 
+                                                         measurementError=attr[node1]['measurement error']))
                     self.QubitsTables[table][f'{node1}-{node2}'] \
-                    [f'QNICs-{node2}'].put(PhysicalQubit(node2, i, f'{node1}-{node2}', table[:8], self.env, table, attr[node2]['memory function'], attr[node2]['gate error'], attr[node2]['measurement error']))
+                    [f'QNICs-{node2}'].put(PhysicalQubit(node1=node2, 
+                                                         node2=node1, 
+                                                         qubitID=i, 
+                                                         qnic=f'{node1}-{node2}', 
+                                                         role=table[:8], 
+                                                         env=self.env, 
+                                                         table=table, 
+                                                         memFunc=attr[node2]['memory function'], 
+                                                         gate_error=attr[node2]['gate error'], 
+                                                         measurementError=attr[node2]['measurement error']))
 
         self.internalLogicalQubitTable = { f'{node1}-{node2}': {
             f'QNICs-{node1}' : [],

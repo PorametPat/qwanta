@@ -154,7 +154,7 @@ class Mixin:
         '''
         pass
 
-    # To let it independently process just have mother while True moniter 
+    # To let it independently process just have moniter while True moniter 
     # Bell pair and troll it to another processing process
 
     def PrototypeExternalEntanglementSwapping(self, process, edge1, edge2, num_required=1, label_in='Physical', label_out='Physical', resource_type='Physical', note=None):
@@ -252,19 +252,33 @@ class Mixin:
             Bell_left[1].setFree(); Bell_right[0].setFree()
 
             # Release physcial qubit for encoding
+            '''
             for i in range(len(Bell_left[1].physical_list)):
                 self.QubitsTables[Bell_left[1].physical_list[i].table][Bell_left[1].physical_list[i].qnics_address] \
                                     [f'QNICs-{Bell_left[1].physical_list[i].qubit_node_address}'].put(Bell_left[1].physical_list[i])
                 self.QubitsTables[Bell_right[0].physical_list[i].table][Bell_right[0].physical_list[i].qnics_address] \
                                     [f'QNICs-{Bell_right[0].physical_list[i].qubit_node_address}'].put(Bell_right[0].physical_list[i])
+            '''
+            for qu in Bell_left[1].physical_list:
+                self.env.process(self.returnToQubitTable(qu))
+            for qu in Bell_right[0].physical_list:
+                self.env.process(self.returnToQubitTable(qu))
 
             # Release physcial qubit for detecting
+            '''
             for i in range(len(Bell_left[1].ancilla_list)):
                 Bell_left[1].ancilla_list[i].setFree();Bell_right[0].ancilla_list[i].setFree()
                 self.QubitsTables[Bell_left[1].ancilla_list[i].table][Bell_left[1].ancilla_list[i].qnics_address] \
                                     [f'QNICs-{Bell_left[1].ancilla_list[i].qubit_node_address}'].put(Bell_left[1].ancilla_list[i])
                 self.QubitsTables[Bell_right[0].ancilla_list[i].table][Bell_right[0].ancilla_list[i].qnics_address] \
                                     [f'QNICs-{Bell_right[0].ancilla_list[i].qubit_node_address}'].put(Bell_right[0].ancilla_list[i])
+            '''
+            for qu in Bell_left[1].ancilla_list:
+                qu.setFree()
+                self.env.process(self.returnToQubitTable(qu))
+            for qu in Bell_right[0].ancilla_list:
+                qu.setFree()
+                self.env.process(self.returnToQubitTable(qu))
 
         else:
             Bell_right[0].CNOT_gate(Bell_left[1])
@@ -278,8 +292,11 @@ class Mixin:
 
             Bell_left[1].setFree(); Bell_right[0].setFree()
 
-            self.QubitsTables[Bell_left[1].table][Bell_left[1].qnics_address][f'QNICs-{Bell_left[1].qubit_node_address}'].put(Bell_left[1])
-            self.QubitsTables[Bell_right[0].table][Bell_right[0].qnics_address][f'QNICs-{Bell_right[0].qubit_node_address}'].put(Bell_right[0])
+            #self.QubitsTables[Bell_left[1].table][Bell_left[1].qnics_address][f'QNICs-{Bell_left[1].qubit_node_address}'].put(Bell_left[1])
+            #self.QubitsTables[Bell_right[0].table][Bell_right[0].qnics_address][f'QNICs-{Bell_right[0].qubit_node_address}'].put(Bell_right[0])
+            
+            self.env.process(self.returnToQubitTable(Bell_left[1]))
+            self.env.process(self.returnToQubitTable(Bell_right[0]))
 
         # classical notification for result
         if nx.dijkstra_path_length(self.graph, leftNode, swapper) < nx.dijkstra_path_length(self.graph, rightNode, swapper):

@@ -339,7 +339,7 @@ class Mixin:
 
                 # Add delay before next emittion
                 pulse_rate = self.graph[node1][node2]['Pulse rate'] 
-                yield self.env.timeout(pulse_rate) #0.0001
+                yield self.env.timeout(pulse_rate) 
                 self.numBaseBellAttempt += 1
 
     def PhotonTraveling(self, node1, node2, qubit1, qubit2, middleNode=None, EPPS=False):
@@ -475,7 +475,8 @@ class Mixin:
                 if num_required is not True:
                     isSuccess += 1
             else:
-                # Set free to reset initial time.
+                # Set free to reset initial time. 
+                # Since classical message is herald, We assume that information about returning qubit to table is also transfer
                 freeQubitNode1.setFree(); freeQubitNode2.setFree()
                 self.QubitsTables['externalQubitsTable'][f'{node1}-{node2}'][f'QNICs-{node1}'].put(freeQubitNode1)
                 self.QubitsTables['externalQubitsTable'][f'{node1}-{node2}'][f'QNICs-{node2}'].put(freeQubitNode2)

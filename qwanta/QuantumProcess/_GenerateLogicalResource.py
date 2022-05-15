@@ -323,8 +323,11 @@ class Mixin:
         for bell in Bells:
             bell[0].setFree(); bell[1].setFree()
             # Feed qubit back to external resource
-            self.QubitsTables[bell[0].table][bell[0].qnics_address][f'QNICs-{bell[0].qubit_node_address}'].put(bell[0])
-            self.QubitsTables[bell[1].table][bell[1].qnics_address][f'QNICs-{bell[1].qubit_node_address}'].put(bell[1])
+            # self.QubitsTables[bell[0].table][bell[0].qnics_address][f'QNICs-{bell[0].qubit_node_address}'].put(bell[0])
+            # self.QubitsTables[bell[1].table][bell[1].qnics_address][f'QNICs-{bell[1].qubit_node_address}'].put(bell[1])
+
+            self.env.process(self.returnToQubitTable(bell[0]))
+            self.env.process(self.returnToQubitTable(bell[1]))
         
         # Add new logical resource 
         self.createLinkResource(node1, node2, logicalQubit1, logicalQubit2, result_table, label_out)

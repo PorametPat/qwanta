@@ -180,15 +180,23 @@ class Mixin:
             self.qubitsLog.append({f'{node1}': tmp1, f'{node2}': tmp2, 'Time': self.env.now})
 
             # Release ancilla qubit for detecting
+            '''
             for i in range(len(Bell[0].ancilla_list)):
                 Bell[0].ancilla_list[i].setFree(); Bell[1].ancilla_list[i].setFree()
                 self.QubitsTables[Bell[0].ancilla_list[i].table][Bell[0].ancilla_list[i].qnics_address] \
                                     [f'QNICs-{Bell[0].ancilla_list[i].qubit_node_address}'].put(Bell[0].ancilla_list[i])
                 self.QubitsTables[Bell[1].ancilla_list[i].table][Bell[1].ancilla_list[i].qnics_address] \
                                     [f'QNICs-{Bell[1].ancilla_list[i].qubit_node_address}'].put(Bell[1].ancilla_list[i])
+            '''
+            for qu in Bell[1].ancilla_list:
+                qu.setFree()
+                self.env.process(self.returnToQubitTable(qu))
+            for qu in Bell[0].ancilla_list:
+                qu.setFree()
+                self.env.process(self.returnToQubitTable(qu))
 
             for i in range(7):
-                #print(Bell[0].physical_list[i].qubitID, Bell[1].physical_list[i].qubitID)
+
                 if Bell[0].physical_list[i].initiateTime is None or Bell[1].physical_list[i].initiateTime is None:
                     raise ValueError("Initiate time is not set")
         else:
@@ -242,17 +250,26 @@ class Mixin:
         if resource_type == 'Logical':
             Bell[0].setFree(); Bell[1].setFree()
             # Release physcial qubit for encoding
+            '''
             for i in range(len(Bell[0].physical_list)):
                 self.QubitsTables[Bell[0].physical_list[i].table][Bell[0].physical_list[i].qnics_address] \
                                     [f'QNICs-{Bell[0].physical_list[i].qubit_node_address}'].put(Bell[0].physical_list[i])
                 self.QubitsTables[Bell[1].physical_list[i].table][Bell[1].physical_list[i].qnics_address] \
                                     [f'QNICs-{Bell[1].physical_list[i].qubit_node_address}'].put(Bell[1].physical_list[i])
+            '''
+            for qu in Bell[0].physical_list:
+                self.env.process(self.returnToQubitTable(qu))
+            for qu in Bell[1].physical_list:
+                self.env.process(self.returnToQubitTable(qu))
 
         else:
             Bell[0].setFree(); Bell[1].setFree()
-            self.QubitsTables[Bell[0].table][Bell[0].qnics_address][f'QNICs-{Bell[0].qubit_node_address}'].put(Bell[0])
-            self.QubitsTables[Bell[1].table][Bell[1].qnics_address][f'QNICs-{Bell[1].qubit_node_address}'].put(Bell[1])
+            # self.QubitsTables[Bell[0].table][Bell[0].qnics_address][f'QNICs-{Bell[0].qubit_node_address}'].put(Bell[0])
+            # self.QubitsTables[Bell[1].table][Bell[1].qnics_address][f'QNICs-{Bell[1].qubit_node_address}'].put(Bell[1])
         
+            self.env.process(self.returnToQubitTable(Bell[0]))
+            self.env.process(self.returnToQubitTable(Bell[1]))
+
         # self.updateLog({'Time': self.env.now, 'Message': f'{resource_type} resource used'})
     
         if num_required is not True:

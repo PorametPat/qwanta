@@ -1,3 +1,4 @@
+from ast import Raise
 import networkx as nx
 
 class Mixin:
@@ -64,3 +65,16 @@ class Mixin:
         #yield self.env.timeout(self.getTimeToTravel(source, destination))
         yield self.env.timeout(nx.dijkstra_path_length(self.graph, source, destination))
         '''
+
+    def returnToQubitTable(self, qubit):
+        if qubit.role == 'external':
+            # Send classical message to neighbor first 
+            yield self.env.process(self.classicalCommunication(qubit.qubit_node_address, qubit.qubit_neighbor_address))
+        elif qubit.role == 'internal':
+            # Internal notification required zero time.
+            pass
+        else:
+            raise ValueError(f'Qubit is set with invalid type of role {qubit.role}')
+
+        # Put resource back to its own table
+        self.QubitsTables[qubit.table][qubit.qnics_address][f'QNICs-{qubit.qubit_node_address}'].put(qubit)

@@ -177,7 +177,7 @@ class Mixin:
             x_result1, x_result2 = Bells[1][0].measureZ(), Bells[1][1].measureZ()
             z_result1, z_result2 = Bells[2][0].measureX(), Bells[2][1].measureX()
 
-            # classical notification for result
+            # classical notification for result and also notify that Bell pairs is free now.
             yield self.env.process(self.classicalCommunication(node1, node2))
 
             if (x_result1 == x_result2) and (z_result1 == z_result2):
