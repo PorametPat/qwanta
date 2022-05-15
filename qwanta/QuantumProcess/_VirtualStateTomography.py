@@ -108,7 +108,7 @@ class Mixin:
             
             # self.updateLog({'Time': self.env.now, 'Message': f'{resource_type} resource used'})
         
-            if num_required is not True:
+            if not isinstance(num_required, bool):
                 isSuccess += 1
 
 
@@ -272,7 +272,7 @@ class Mixin:
 
         # self.updateLog({'Time': self.env.now, 'Message': f'{resource_type} resource used'})
     
-        if num_required is not True:
+        if not isinstance(num_required, bool):
             process['isSuccess'] += 1
 
         if process['isSuccess'] == num_required:

@@ -174,7 +174,7 @@ class Mixin:
             else:
                 raise ValueError(f'Encoding protocol is {protocol} is not defined.')
 
-            if num_required is not True:
+            if not isinstance(num_required, bool):
                 isSuccess += 1
 
 
@@ -332,7 +332,7 @@ class Mixin:
         # Add new logical resource 
         self.createLinkResource(node1, node2, logicalQubit1, logicalQubit2, result_table, label_out)
 
-        if num_required is not True:
+        if not isinstance(num_required, bool):
             process['isSuccess'] += 1
 
     def _independentPurifiedEncoded(self, info):
@@ -377,5 +377,5 @@ class Mixin:
     
         self.createLinkResource(node1, node2, logicalQubit1, logicalQubit2, result_table, label_out)
 
-        if num_required is not True:
+        if not isinstance(num_required, bool):
             process['isSuccess'] += 1

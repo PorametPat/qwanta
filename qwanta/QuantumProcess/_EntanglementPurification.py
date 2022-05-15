@@ -105,7 +105,7 @@ class Mixin:
                     self.updateLog({'Time': self.env.now, 'Message': f'Purification for {node1}-{node2} fail'})
 
 
-            if num_required is not True:
+            if not isinstance(num_required, bool):
                 isSuccess += 1 
 
     def PrototypePurification(self, process, node1, node2, num_required=1, label_in='Physical', label_out='Purified',protocol='Ss-Dp', note=None):
@@ -233,5 +233,5 @@ class Mixin:
                 # self.updateLog({'Time': self.env.now, 'Message': f'Purification for {node1}-{node2} fail'})
 
 
-        if num_required is not True:
+        if not isinstance(num_required, bool):
             process['isSuccess'] += 1 

@@ -135,7 +135,7 @@ class Mixin:
             self.updateLog({'Time': self.env.now, 'Message': f'Entanglement swapping for {leftNode}-{rightNode} success'})
             self.createLinkResource(leftNode, rightNode, *new_Bell, table, label=label_out)
 
-            if num_required is not True:
+            if not isinstance(num_required, bool):
                 isSuccess += 1
 
     def SimultanouseEntanglementSwapping(self):
@@ -333,5 +333,5 @@ class Mixin:
         
         self.createLinkResource(leftNode, rightNode, *new_Bell, table, label=label_out)
 
-        if num_required is not True:
+        if not isinstance(num_required, bool):
             process['isSuccess'] += 1

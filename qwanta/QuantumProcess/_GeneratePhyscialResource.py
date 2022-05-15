@@ -125,7 +125,7 @@ class Mixin:
                     # Update resource and set busy to true
                     self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out, initial=True)
                     
-                    if num_required is not True:
+                    if not isinstance(num_required, bool):
                         isSuccess += 1
                 else:
                     freeQubitNode1.setFree(); freeQubitNode2.setFree()
@@ -186,7 +186,7 @@ class Mixin:
                     # Update resource and set busy to true
                     self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out, initial=True)
                     
-                    if num_required is not True:
+                    if not isinstance(num_required, bool):
                         isSuccess += 1
                 else:
                     # Set free to reset initial time.
@@ -248,7 +248,7 @@ class Mixin:
                     # Update resource and set busy to true
                     self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out, initial=True)
                     
-                    if num_required is not True:
+                    if not isinstance(num_required, bool):
                         isSuccess += 1
                 else:
                     self.QubitsTables['externalQubitsTable'][f'{node1}-{node2}'][f'QNICs-{node1}'].put(freeQubitNode1)
@@ -308,7 +308,7 @@ class Mixin:
                     # Update resource and set busy to true
                     self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out, initial=True)
                     
-                    if num_required is not True:
+                    if not isinstance(num_required, bool):
                         isSuccess += 1
                 else:
                     self.QubitsTables['externalQubitsTable'][f'{node1}-{node2}'][f'QNICs-{node1}'].put(freeQubitNode1)
@@ -472,7 +472,7 @@ class Mixin:
                 # Update resource and set busy to true
                 self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out, initial=True)
                 
-                if num_required is not True:
+                if not isinstance(num_required, bool):
                     isSuccess += 1
             else:
                 # Set free to reset initial time. 
