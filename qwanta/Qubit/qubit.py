@@ -476,7 +476,7 @@ class LogicalQubit:
 
 class PhysicalQubit:
 
-    def __init__(self, node1, qubitID, qnic, role, env, table, memFunc, gate_error, measurementError):
+    def __init__(self, node1, node2, qubitID, qnic, role, env, table, memFunc, gate_error, measurementError):
         # Simulation setup
         self.env = env
         self.table = table
@@ -490,6 +490,7 @@ class PhysicalQubit:
         self.qnics_address = qnic
         self.role = role
         self.qubit_node_address = node1
+        self.qubit_neighbor_address = node2
         
         self.initiateTime = None
 

@@ -13,7 +13,7 @@ class TestPhysicalQubit(unittest.TestCase):
         self.memFunc = [1, 0, 0, 0]
         self.gateError = 0
         self.measurementError = 0
-        self.qubit = PhysicalQubit('EndNode1', 0, 'EndNode1-EndNode2', 'test_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError)
+        self.qubit = PhysicalQubit('EndNode1', 'EndNode2', 0, 'EndNode1-EndNode2', 'test_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError)
         self.qubit.setInitialTime()
         return super().setUp()
 
@@ -35,7 +35,7 @@ class TestPhysicalQubit(unittest.TestCase):
         self.assertEqual(self.qubit.error_z, True)
 
     def test_CNOTgate(self):
-        control_qubit = PhysicalQubit('EndNode1', 1, 'EndNode1-EndNode2', 'test_target_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError)
+        control_qubit = PhysicalQubit('EndNode1', 'EndNode2', 1, 'EndNode1-EndNode2', 'test_target_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError)
         control_qubit.error_x = True
 
         # X error propagatation
