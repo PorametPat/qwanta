@@ -78,11 +78,11 @@ for params_set in parameters_set:
             'base Bell pairs attempted': exp['Base Resources Attempt'],
             'distance': distance,
             'XX commute': exp['Commutation inforamtion']['XX']['commute'],
-            'XX anti-commute': exp['Commutation inforamtion']['XX']['anit-commute'],
+            'XX anti-commute': exp['Commutation inforamtion']['XX']['anti-commute'],
             'YY commute': exp['Commutation inforamtion']['YY']['commute'],
-            'YY anti-commute': exp['Commutation inforamtion']['YY']['anit-commute'],
+            'YY anti-commute': exp['Commutation inforamtion']['YY']['anti-commute'],
             'ZZ commute': exp['Commutation inforamtion']['ZZ']['commute'],
-            'ZZ anti-commute': exp['Commutation inforamtion']['ZZ']['anit-commute'],
+            'ZZ anti-commute': exp['Commutation inforamtion']['ZZ']['anti-commute'],
         }
         data_set.append(data)
 
