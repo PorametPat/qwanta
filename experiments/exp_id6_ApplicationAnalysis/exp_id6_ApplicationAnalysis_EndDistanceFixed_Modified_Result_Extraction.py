@@ -106,7 +106,7 @@ for params_set in parameters_set:
         loss = params_set['loss rate']
         p_dep = params_set['depolarizing rate']
         gate_error = params_set['gate error rate']
-        mem_error = params_set['mem_error']
+        mem_error = params_set['memory error']
         measure_error = params_set['measurement error']
         hops = params_set['number of hops']
         trajectory = params_set['trajectory']
