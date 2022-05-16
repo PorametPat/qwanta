@@ -124,7 +124,7 @@ class Mixin:
         
         num_measure_per_stab = int(num_required/3)
 
-        while process['isSuccess'] + 1 < num_required:
+        while process['isSuccess'] < num_required:
 
             Bell = yield table[f'{node1}-{node2}'].get(lambda bell: bell[2]==label_in)
 
