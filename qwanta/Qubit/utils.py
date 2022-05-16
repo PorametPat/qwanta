@@ -1,3 +1,4 @@
+from sklearn import neighbors
 from .qubit import PhysicalQubit
 import random
 from sympy import Symbol
@@ -8,6 +9,7 @@ import itertools
 def GetQubit(memoryFunction=None, gate_error=None, measurementError=None):
     
     node = 'DummyNode'
+    neighbor_node = 'DummyNode2'
     qubitID = 'Qubit1'
     qnic = 'QNIC1'
     role = 'Physical'
@@ -17,7 +19,7 @@ def GetQubit(memoryFunction=None, gate_error=None, measurementError=None):
     gate_error = gate_error if gate_error is not None else 0
     measurementError = measurementError if measurementError is not None else 0
 
-    q = PhysicalQubit(node, qubitID, qnic, role, env, table, memoryFunction, gate_error, measurementError)
+    q = PhysicalQubit(node, neighbor_node, qubitID, qnic, role, env, table, memoryFunction, gate_error, measurementError)
     q.setInitialTime()
     
     return q
