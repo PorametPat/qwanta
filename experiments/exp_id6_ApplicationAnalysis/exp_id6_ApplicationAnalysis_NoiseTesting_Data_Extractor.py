@@ -58,6 +58,8 @@ for params_set in parameters_set:
         Node_left = exp['throughtputEdges'][0]
         Node_right = exp['throughtputEdges'][1]
 
+        print(exp.keys())
+
         data = {
             'index': index,
             'loss rate': loss, 
