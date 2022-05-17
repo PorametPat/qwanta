@@ -291,13 +291,13 @@ class Mixin:
         
         # Sent measurement result to another node
         yield self.env.process(self.classicalCommunication(node1, node2))
-        for result in results:
+        for index, result in enumerate(results):
             if result:
-                Bells[i][1].X_gate(gate_error=0)
+                Bells[index][1].X_gate(gate_error=0)
             
             x = np.random.random()
             if x > 0.5:
-                Bells[i][1].I_gate()
+                Bells[index][1].I_gate()
         
         # Step 2
         for i in range(7):
@@ -311,13 +311,13 @@ class Mixin:
 
         # Sent measurement result to another node
         yield self.env.process(self.classicalCommunication(node2, node1))
-        for result in results:
+        for index, result in enumerate(results):
             if result:
-                logicalQubit1.physical_list[i].Z_gate(gate_error=0)
+                logicalQubit1.physical_list[index].Z_gate(gate_error=0)
             
             x = np.random.random()
             if x > 0.5:
-                logicalQubit1.physical_list[i].I_gate()
+                logicalQubit1.physical_list[index].I_gate()
 
         # Set Bell pair free
         for bell in Bells:
