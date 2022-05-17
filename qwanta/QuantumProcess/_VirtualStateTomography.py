@@ -244,7 +244,11 @@ class Mixin:
 
             self.numResourceUsedForFidelityEstimation += 1
             # Get error operator of each qubit 
-            self.measurementResult.append({'qubit1': result_1_ST, 'qubit2': result_2_ST})  
+            self.measurementResult.append({'qubit1': result_1_ST, 'qubit2': result_2_ST}) 
+
+            # Record final time stamp
+            if (self.numResourceUsedForFidelityEstimation == int(3*num_measure_per_stab)):
+                self.FidelityEstimationTimeStamp = self.env.now - self.FidelityEstimationTimeStamp 
  
         
         if resource_type == 'Logical':
@@ -281,8 +285,6 @@ class Mixin:
             normalize_ZZ = (self.Expectation_value['ZZ']['commute'] - self.Expectation_value['ZZ']['anti-commute'])/(self.Expectation_value['ZZ']['commute'] + self.Expectation_value['ZZ']['anti-commute'])
             self.fidelityStabilizerMeasurement = (0.25)*(1 + normalize_XX + normalize_YY + normalize_ZZ)
 
-            if (self.numResourceUsedForFidelityEstimation == process['isSuccess']):
-                self.FidelityEstimationTimeStamp = self.env.now - self.FidelityEstimationTimeStamp
 
         if self.configuration.collectFidelityHistory:
             # Collect fidelity history
