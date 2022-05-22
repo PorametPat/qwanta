@@ -276,8 +276,8 @@ class TestLogicalQubit(unittest.TestCase):
 
         for index, qubit in enumerate(logicalQubit.physical_list):
             
-            qubit.error_x = False
-            qubit.error_z = False
+            qubit.error_x = True
+            qubit.error_z = True
 
             logicalQubit.error_detection_correction(perfect_correction=True)
 
