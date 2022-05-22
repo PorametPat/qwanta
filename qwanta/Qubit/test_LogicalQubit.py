@@ -221,7 +221,9 @@ class TestLogicalQubit(unittest.TestCase):
                 qubit.error_x = True
                 qubit.error_z = True
         
-        self.logicalQubit.error_detection_correction()
+        syn_x, syn_z = self.logicalQubit.error_detection_correction(return_syndrome=True)
+        self.assertEqual(syn_x, 1)
+        self.assertEqual(syn_z, 1)
 
         for qubit in self.logicalQubit.physical_list:
             self.assertEqual(qubit.error_x, False)
@@ -231,7 +233,9 @@ class TestLogicalQubit(unittest.TestCase):
             if index in [0, 1, 2, 6]:
                 qubit.error_x = True
     
-        self.logicalQubit.error_detection_correction()
+        syn_x, syn_z = self.logicalQubit.error_detection_correction(return_syndrome=True)
+        self.assertEqual(syn_x, 6)
+        self.assertEqual(syn_z, -1)
 
         for index, qubit in enumerate(self.logicalQubit.physical_list):
             if index in [3, 4, 5, 6]:
@@ -243,7 +247,9 @@ class TestLogicalQubit(unittest.TestCase):
             if index in [0, 1, 2, 6]:
                 qubit.error_z = True
     
-        self.logicalQubit.error_detection_correction()
+        syn_x, syn_z = self.logicalQubit.error_detection_correction(return_syndrome=True)
+        self.assertEqual(syn_x, -1)
+        self.assertEqual(syn_z, 6)
 
         for index, qubit in enumerate(self.logicalQubit.physical_list):
             if index in [3, 4, 5, 6]:
