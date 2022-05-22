@@ -347,14 +347,16 @@ class LogicalQubit:
                 error_x.append(i.error_x)
             
             _ , location_x = self.classical_error_correction(error_x)
-            self.physical_list[location_x].error_x = not self.physical_list[location_x].error_x
+            if location_x != -1:
+                self.physical_list[location_x].error_x = not self.physical_list[location_x].error_x
 
             error_z = []
             for i in self.physical_list:
                 error_z.append(i.error_z)
             
             _ , location_z = self.classical_error_correction(error_z)
-            self.physical_list[location_z].error_z = not self.physical_list[location_z].error_z
+            if location_z != -1:
+                self.physical_list[location_z].error_z = not self.physical_list[location_z].error_z
 
             self.reinitializeAncilla()
             return None
