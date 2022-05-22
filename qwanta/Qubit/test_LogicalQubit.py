@@ -243,7 +243,7 @@ class TestLogicalQubit(unittest.TestCase):
 
         env = VirtualSimpyEnvironment()
         memFunc = [0.25, .25, .25, .25]
-        gateError = [0.5, .5, 0, 0]
+        gateError = 0.5
         measurementError = 1
         PhysicalQubits = [PhysicalQubit('Damm', 'you', i, 'boy!', 'encoding_qubit', env, 'test', memFunc, gateError, measurementError) for i in range(7)]
         logicalQubit = LogicalQubit('Damm', 'Steane', 'girl!', env)
@@ -258,8 +258,8 @@ class TestLogicalQubit(unittest.TestCase):
 
         for index, qubit in enumerate(logicalQubit.physical_list):
             
-            qubit.error_x = True
-            qubit.error_z = True
+            qubit.error_x = False
+            qubit.error_z = False
 
             logicalQubit.error_detection_correction(perfect_correction=True)
 

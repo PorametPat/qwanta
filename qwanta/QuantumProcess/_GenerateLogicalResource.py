@@ -5,7 +5,6 @@ import uuid
 from ..Qubit import LogicalQubit
 
 class Mixin:
-       
     def generateLogicalResource(self, node1, node2, num_required=1, label_in='Physical', label_out='Logical', protocol='Non-local CNOT'):
 
         # Valiate node order
