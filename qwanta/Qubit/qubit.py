@@ -262,10 +262,9 @@ class LogicalQubit:
 
     def classical_error_correction(self, codeword):
 
-        G = [[False, False, False, True, True, True, True], # G1
-             [False, True, True, False, False, True, True], # G2
-             [True, False, True, False, True, False, True]] # G3
-
+        G = [[True, False, True, False, True, False, True], # G2
+             [False, True, True, False, False, True, True], # G3
+             [False, False, False, True, True, True, True]] # G1
         location_bool = [False, False, False]
         for i in range(len(G)):
             flag = False
@@ -275,7 +274,7 @@ class LogicalQubit:
         
             location_bool[i] = flag
         
-        location = self.boolToInt(location_bool) - 1 # minus one becasue the shift of index
+        location = int(''.join([str(int(i)) for i in location_bool])[::-1], base=2) - 1  # minus one becasue the shift of index
         new_codeword = codeword[:]
         corrected = False
         if location != -1:
