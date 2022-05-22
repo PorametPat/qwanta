@@ -239,6 +239,18 @@ class TestLogicalQubit(unittest.TestCase):
             else:
                 self.assertEqual(qubit.error_x, True)
 
+        for index, qubit in enumerate(self.logicalQubit.physical_list):
+            if index in [0, 1, 2, 6]:
+                qubit.error_z = True
+    
+        self.logicalQubit.error_detection_correction()
+
+        for index, qubit in enumerate(self.logicalQubit.physical_list):
+            if index in [3, 4, 5, 6]:
+                self.assertEqual(qubit.error_z, False)
+            else:
+                self.assertEqual(qubit.error_z, True)
+
     def test_perfect_error_correction(self):
 
         env = VirtualSimpyEnvironment()
@@ -263,5 +275,6 @@ class TestLogicalQubit(unittest.TestCase):
 
             logicalQubit.error_detection_correction(perfect_correction=True)
 
-            self.assertEqual(qubit.error_x, False)
-            self.assertEqual(qubit.error_z, False)
+            for ii, q in enumerate(logicalQubit.physical_list):
+                self.assertEqual(q.error_x, False)
+                self.assertEqual(q.error_z, False)
