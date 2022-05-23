@@ -128,11 +128,10 @@ for hops in number_of_hops_list:
                                     'number of hops': hops,
                                     'fidelity': exp['fidelity'],
                                     'total time': exp['Time used'],
-                                    'base Bell pairs': exp['Base Resources Produced']
                                 }
                                 parameters_set.append(data)
                         index += 1
 
 DataFrame = pd.DataFrame(parameters_set)
-DataFrame.to_csv('exp_id2_StrategiesAnalysisNoiseSensitivity_-erfect_fixed_Extracted_Data.csv', index=False)
+DataFrame.to_csv('exp_id2_StrategiesAnalysisNoiseSensitivity_perfect_fixed_Extracted_Data.csv', index=False)
 

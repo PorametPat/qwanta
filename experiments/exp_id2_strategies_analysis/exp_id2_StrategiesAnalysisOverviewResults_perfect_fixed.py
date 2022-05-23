@@ -128,7 +128,6 @@ for hops in number_of_hops_list:
                                     'number of hops': hops,
                                     'fidelity': exp['fidelity'],
                                     'total time': exp['Time used'],
-                                    'base Bell pairs': exp['Base Resources Produced']
                                 }
                                 parameters_set.append(data)
                         index += 1
