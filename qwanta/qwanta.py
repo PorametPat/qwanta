@@ -109,14 +109,15 @@ class Xperiment:
         
         self.process_graph = {}
 
-    def validate(self, vis=False, get_table=False):
+    def validate(self, vis=False, get_table=False, show_message=False):
         validate_table = []
+        message = ''
 
         exper_allGreen = 0
         for exper in self.strategies_list:
 
-            print(f'\nValidating experiment: {exper}')
-            print('---------------------------------------------')
+            message += f'\nValidating experiment: {exper}'
+            message += '\n---------------------------------------------'
 
             topology =self.edges_info_exp[exper]
             timeline = self.timelines[exper]
@@ -154,15 +155,15 @@ class Xperiment:
                 p_dep = topology[edge]['depolarlizing error']
                 if type(p_dep) is list:
                     if len(p_dep) != 4:
-                        print(f'[{exper}] length depolarizing probability of {edge} is not 4')
+                        message += f'\n[{exper}] length depolarizing probability of {edge} is not 4'
                         Parameters_test['depolarizing error'] = False
                     if int(round(sum(np.abs(p_dep)), 4)) != 1:
-                        print(f'[{exper}] WARNING sum of depolarizing probability of {edge} is not 1 to decimal 4.')
+                        message += f'\n[{exper}] WARNING sum of depolarizing probability of {edge} is not 1 to decimal 4.'
                         Parameters_test['depolarizing error'] = False
 
             # gate_error
             if gate_error > 1 or gate_error < 0:
-                print(f'[{exper}] WARNING gate error probability is not a valid value.')
+                message += f'\n[{exper}] WARNING gate error probability is not a valid value.'
                 Parameters_test['gate error'] = False
 
             # memory_error
@@ -171,19 +172,20 @@ class Xperiment:
                     x = random.random()
                     p = memory_error(x)
                     if len(p) != 4:
-                        print(f'[{exper}] length of memory error is not 4')
+                        message += f'\n[{exper}] length of memory error is not 4'
                         Parameters_test['memory error'] = False
+                        break
                     if int(round(sum(p), 2)) != 1:
-                        print(f'[{exper}] WARNING sum of memory error probability of {edge} is not 1 to decimal 2.')
+                        message += f'\n[{exper}] WARNING sum of memory error probability of {edge} is not 1 to decimal 2.'
             else:
-                print(f'[{exper}] WARNING memory error is not callable function')
+                message += f'\n[{exper}] WARNING memory error is not callable function'
                 if len(memory_error) != 4:
-                    print(f'[{exper}] length of memory error is not 4')
+                    message += f'\n[{exper}] length of memory error is not 4'
                     Parameters_test['memory error'] = False
             
             # measurement_error
             if measurement_error > 1:
-                print(f'[{exper}] measurement error provided is more than 1')
+                message += f'\n[{exper}] measurement error provided is more than 1'
                 Parameters_test['measurement error'] = False
 
             # Valiate Process-flow and number of resource
@@ -193,7 +195,7 @@ class Xperiment:
                 G.add_edge(edge[0], edge[1]) 
             nx.set_edge_attributes(G, topology)
 
-            print('Limited Process: ')
+            message += '\nLimited Process: '
             limited_processes = []
             for process in timeline:
                 if type(process['Num Trials'] )is int:
@@ -204,28 +206,28 @@ class Xperiment:
                     else:
                         is_end_to_end = f'Non-E2E process -> {process["Edges"]}'
 
-                    print(f'{len(limited_processes)}. ' ,process['Main Process'], f': {is_end_to_end}')
+                    message += f"\n{len(limited_processes)}. {process['Main Process']} : {is_end_to_end}"
             
 
             if len(limited_processes) == 0:
             # Detect no limited process simulation
-                print(f'[{exper}] experiment has no limited process...')
+                message += f'\n[{exper}] experiment has no limited process...'
 
                 if sim_time is None:
-                    print(f'[{exper}] WARNING: simulation might not terminate')
+                    message += f'\n[{exper}] WARNING: simulation might not terminate'
             
             if sim_time is not None:
-                print(f'[{exper}] experiment will end with simulation time limit: {sim_time}s')
+                message += f'\n[{exper}] experiment will end with simulation time limit: {sim_time}s'
 
             if Dynamic_flag:
-                print(f'[{exper}] experiment contains dynamic nodes...')
+                message += f'\n[{exper}] experiment contains dynamic nodes...'
                 if sim_time is None:
-                    print(f'[{exper}] experiment will terminate only if limited process is finish, please make sure that loss and distance provided are reasonable as simulation might take insanely much time to finish...')
+                    message += f'\n[{exper}] experiment will terminate only if limited process is finish, please make sure that loss and distance provided are reasonable as simulation might take insanely much time to finish...'
 
             if nx.is_connected(G):
-                print('Topology provied is connected graph...')
+                message += '\nTopology provied is connected graph...'
             else:
-                print('The topology provided is not connected, this might not be what is expected...')
+                message += '\nThe topology provided is not connected, this might not be what is expected...'
 
             # Validate if all edges have generate physical resource
 
@@ -241,11 +243,11 @@ class Xperiment:
                             missing_process_edge.append(edge)
 
             if num_gpr == len(G.edges):
-                print('All edges have Generate physical Bell pair process...') 
+                message += '\nAll edges have Generate physical Bell pair process...'
             else:
-                print('Not all edge have Generate physical Bell pair process, the missing edges are, ')
+                message += '\nNot all edge have Generate physical Bell pair process, the missing edges are, '
                 for edge in missing_process_edge:
-                    print(edge)
+                    message += f'\n{edge}'
 
             # Create process graph, process -> node , label -> edge
 
@@ -287,7 +289,7 @@ class Xperiment:
                                 if nx.has_path(timelineGraph, to_process['node'], process['node']):
                                     reach_status[node] = True
                             except nx.NodeNotFound as e:
-                                print(f"{e}")
+                                message += f"\n{e}"
                                 return reach_status
                 return reach_status
             
@@ -309,10 +311,10 @@ class Xperiment:
                         pass
                         # print(f'{limited_process} could not reach {node}, this problem might coming from wrong node is specify to the process or/and label is not match.') 
                 if reachable == len(limitedProcessReachStatus[limited_process]):
-                    print(f'Limited process: {limited_process} is reachable to fundamental resource processes...')
+                    message += f'\nLimited process: {limited_process} is reachable to fundamental resource processes...'
                     allGreen = True
                 else:
-                    print(f'Limited process: {limited_process} is not reachable to fundamental resource processes, this might cause an error')
+                    message += f'\nLimited process: {limited_process} is not reachable to fundamental resource processes, this might cause an error'
                     allGreen = False
 
                 if allGreen:
@@ -323,9 +325,9 @@ class Xperiment:
 
             if allGreen:
                 exper_allGreen += 1
-                print(f'[{exper}] all status checked ')
+                message += f'\n[{exper}] all status checked '
             else:
-                print(f'Checking is not pass, please be patient and re-check [{exper}] again.')
+                message += f'\nChecking is not pass, please be patient and re-check [{exper}] again.'
 
 
             net = Network( height='100%', width='100%', notebook=True) 
@@ -389,14 +391,20 @@ class Xperiment:
             dfStyler.set_table_styles([dict(selector='th', props=[('text-align', 'left')])])
             dfStyler.applymap(lambda v: "color:green;" if v == 'PASSED' else "")
             dfStyler.applymap(lambda v: "color:red;" if v == 'FAILED' else "")
+            if show_message:
+                print(message)
             return dfStyler
 
         if exper_allGreen == len(self.strategies_list):
-            print('All timeline and topology of all experiments are validated, you are good to execute Experiment.run() command!\
-                 \nAnother error that is not currently check is the number of qubits needed to completed the task.')
+            message += '\nAll timeline and topology of all experiments are validated, you are good to execute Experiment.run() command!\
+                 \nAnother error that is not currently check is the number of qubits needed to completed the task.'
+            if show_message:
+                print(message)
             return True
         else:
-            print('Test not passed.')
+            message += '\nTest not passed.'
+            if show_message:
+                print(message)
             return False
 
     def execute(self, multithreading=False, save_result=False):
