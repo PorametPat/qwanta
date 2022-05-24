@@ -1,11 +1,24 @@
 from logging import error
 import random
 import numpy as np 
-from scipy.linalg import fractional_matrix_power
+from typing import List, Union, Any, Callable, Optional
 
 class LogicalQubit:
 
-    def __init__(self, node1, qubitID, qnic, env):
+    def __init__(self, 
+                 node1: Any, 
+                 qubitID: Any, 
+                 qnic: Any, 
+                 env: Any):
+        """
+        Init of Logical qubit
+
+        Args:
+            node1 (Any): Node that this logical qubit located
+            qubitID (Any): Part of ID of this logical qubit to be combine with node 1
+            qnic (Any): QNIC that this logical qubit located
+            env (Any): Environment of this qubit.
+        """
         # Simulation setup
         self.env = env
 
@@ -26,7 +39,17 @@ class LogicalQubit:
 
         return None
 
-    def I_gate(self, gate_error=None, ecc='Steane'):
+    def I_gate(self, gate_error: Optional[float] = None, ecc: Optional[str] = 'Steane'):
+        """
+        Apply logical Identity gate to this logical qubit
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            ecc (Optional[str], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
         
         if ecc == 'Steane':
             for i in self.physical_list:
@@ -36,7 +59,17 @@ class LogicalQubit:
                 i.Prototype_I_gate(gate_error=gate_error)
         return None
 
-    def H_gate(self, gate_error=None, ecc='Steane'):
+    def H_gate(self, gate_error: Optional[float] = None, ecc: Optional[str] = 'Steane'):
+        """
+        Apply logical Hadamard gate to this logical qubit
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            ecc (Optional[str], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             for i in self.physical_list:
@@ -46,7 +79,17 @@ class LogicalQubit:
                 i.Prototype_H_gate(gate_error=gate_error)
         return None
 
-    def X_gate(self, gate_error=None, ecc='Steane'):
+    def X_gate(self, gate_error: Optional[float] = None, ecc: Optional[str] = 'Steane'):
+        """
+        Apply logical Pauli X gate to this logical qubit
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            ecc (Optional[str], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             for i in self.physical_list:
@@ -56,7 +99,17 @@ class LogicalQubit:
                 i.Prototype_X_gate(gate_error=gate_error)
         return None
 
-    def Z_gate(self, gate_error=None, ecc='Steane'):
+    def Z_gate(self, gate_error: Optional[float] = None, ecc: Optional[str] = 'Steane'):
+        """
+        Apply logical Pauli Z gate to this logical qubit
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            ecc (Optional[str], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             for i in self.physical_list:
@@ -66,7 +119,17 @@ class LogicalQubit:
                 i.Prototype_Z_gate(gate_error=gate_error)
         return None
 
-    def S_dagger_gate(self, gate_error=None, ecc='Steane'):
+    def S_dagger_gate(self, gate_error: Optional[float] = None, ecc: Optional[str] = 'Steane'):
+        """
+        Apply logical S dagger gate to this logical qubit
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            ecc (Optional[str], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             for i in self.physical_list:
@@ -76,7 +139,17 @@ class LogicalQubit:
                 i.Prototype_S_dagger_gate(gate_error=gate_error)
         return None
 
-    def S_gate(self, gate_error=None, ecc='Steane'):
+    def S_gate(self, gate_error: Optional[float] = None, ecc: Optional[str] = 'Steane'):
+        """
+        Apply logical S gate to this logical qubit
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            ecc (Optional[str], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             for i in self.physical_list:
@@ -86,7 +159,23 @@ class LogicalQubit:
                 i.Prototype_S_gate(gate_error=gate_error)
         return None
 
-    def CNOT_gate(self, control_qubits, target_qubits,ecc='Steane', gate_error=None):
+    def CNOT_gate(self, 
+                  control_qubits: List, 
+                  target_qubits: List, 
+                  ecc: Optional[str] = 'Steane', 
+                  gate_error: Optional[float] = None):
+        """
+        Apply logical CNOT gate to control and target qubits
+
+        Args:
+            control_qubits (List): List of physical qubits of control logical qubit
+            target_qubits (List): List of physical qubits of target logical qubit
+            ecc (Optional[str], optional): Probablity of gate error which will override physical qubit default. Defaults to None.
+            gate_error (Optional[float], optional): Type of error correction to be used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             for i in range(len(control_qubits)):
@@ -96,7 +185,17 @@ class LogicalQubit:
                 target_qubits[i].Prototype_CNOT_gate(control_qubits[i], gate_error=gate_error)
         return None
 
-    def encode(self, ecc='Steane'):
+    def encode(self, ecc: Optional[str] = 'Steane'):
+        """
+        Encode logical qubit using self.physical_list
+        For Steane code, input qubit is 0 but will be swap to qubit 2 internally.
+
+        Args:
+            ecc (Optional[str], optional): Type of quantum error correction code to used. Defaults to 'Steane'.
+
+        Returns:
+            None:
+        """
 
         if ecc == 'Steane':
             # Swap input to index 2
@@ -176,92 +275,18 @@ class LogicalQubit:
 
         return None
 
+    def classical_error_correction(self, codeword: List):
+        """
+        Method for classical error correction on input codeword using Steane generator.
 
-    def measureForFidelity(self, method='get_operator'):
+        Args:
+            codeword (List): List of measurement result of each qubit in self.physical_list
 
-        # Check look up table
-        if method=='get_operator':
-            operators = []
-            for qubit in self.physical_list:
-                operators.append(qubit.measureForFidelity())
-        else:
-            # Error-detection
+        Returns:
+            (List, int): return a corrected codeword and position of error detected, -1 if there is no error.
+        """
 
-            G = [[False, False, False, True, True, True, True], # G1
-                 [False, True, True, False, False, True, True], # G2
-                 [True, False, True, False, True, False, True]] # G3
-
-            location_bool = [False, False, False]
-            for i in range(len(G)):
-                flag = False
-                for j, qubit in enumerate(self.physical_list):
-                    if qubit.error_x == G[i][j] and (qubit.error_x != False and G[i][j] != False):
-                        flag = not flag
-                location_bool[i] = flag
-            
-            location = self.boolToInt(location_bool) - 1 # minus one becasue the shift of index
-
-            # Get logical operator
-            operators = ''
-            if location != -1:
-                count = 0
-                for qubit in self.physical_list:
-                    if qubit.error_x == True:
-                        count += 1
-                if count % 2 == 0:
-                    operators += 'X'
-                else:
-                    operators += 'I'
-            else:
-                count = 0
-                for qubit in self.physical_list:
-                    if qubit.error_x == True:
-                        count += 1
-                if count % 2 == 1:
-                    operators += 'X'
-                else:
-                    operators += 'I'
-
-            for i in range(len(G)):
-                flag = False
-                for j, qubit in enumerate(self.physical_list):
-                    if qubit.error_z == G[i][j] and (qubit.error_z != False and G[i][j] != False):
-                        flag = not flag
-                location_bool[i] = flag
-            
-            location = self.boolToInt(location_bool) - 1 # minus one becasue the shift of index
-
-            # Error correction
-            # Get logical operator
-            if location != -1:
-                # If there are any errors, for even weight error operator,
-                # after correction, return non-trivial logical operator
-                count = 0
-                for qubit in self.physical_list:
-                    # qubit.error_z = not qubit.error_z if qubit.measurementError > random.random() else qubit.error_z
-                    if qubit.error_z == True:
-                        count += 1
-                if count % 2 == 0:
-                    operators += 'Z'
-                else:
-                    operators += 'I'
-            else:
-                # If there is no error, for odd weight error operator,
-                # return, return non-trivial logical operator
-                count = 0
-                for qubit in self.physical_list:
-                    # qubit.error_z = not qubit.error_z if qubit.measurementError > random.random() else qubit.error_z
-                    if qubit.error_z == True:
-                        count += 1
-                if count % 2 == 1:
-                    operators += 'Z'
-                else:
-                    operators += 'I'
-
-        return operators
-
-    def classical_error_correction(self, codeword):
-
+        # Check commutation with Generators
         G = [[True, False, True, False, True, False, True], # G2
              [False, True, True, False, False, True, True], # G3
              [False, False, False, True, True, True, True]] # G1
@@ -274,7 +299,10 @@ class LogicalQubit:
         
             location_bool[i] = flag
         
+        # Convert commutation result into location of noise, if -1 then there is no error.
         location = int(''.join([str(int(i)) for i in location_bool])[::-1], base=2) - 1  # minus one becasue the shift of index
+        
+        # Correct codeword if there is an error.
         new_codeword = codeword[:]
         corrected = False
         if location != -1:
@@ -283,7 +311,26 @@ class LogicalQubit:
 
         return new_codeword, location
 
-    def measure(self, basis, return_mode=False, get_operator=False, measurement_error=None):
+    def measure(self, 
+                basis: str, 
+                return_mode: Optional[bool] = False, 
+                get_operator: Optional[bool] = False, 
+                measurement_error: Optional[float] = None):
+        """
+        Measure logical qubit 
+
+        Args:
+            basis (str): measured-basis
+            return_mode (Optional[bool], optional): If True, will return both corrected codeword and location of error. Defaults to False.
+            get_operator (Optional[bool], optional): If True, will return decoded result and raw result. Defaults to False.
+            measurement_error (Optional[float], optional): Probablity of measurement error to be override physical qubit. Defaults to None.
+
+        Raises:
+            ValueError: Invalid measurement-basis
+
+        Returns:
+            bool: Return classical error corrected decoded result of this logical qubit
+        """
 
         # Measurement
         physical_measurement_result = []
@@ -328,16 +375,73 @@ class LogicalQubit:
         # If odd True return True, even True return False
         return bool(corrected_result.count(True) % 2)
     
-    def measureX(self, return_mode=False, get_operator=False, measurement_error=None):
+    def measureX(self, 
+                 return_mode: Optional[bool] = False, 
+                 get_operator: Optional[bool] = False, 
+                 measurement_error: Optional[float] = None):
+        """Interface of logical qubit measurement in X basis
+
+        Args:
+            return_mode (Optional[bool], optional): If True, will return both corrected codeword and location of error. Defaults to False.
+            get_operator (Optional[bool], optional): If True, will return decoded result and raw result. Defaults to False.
+            measurement_error (Optional[float], optional): Probablity of measurement error to be override physical qubit. Defaults to None.
+
+        Returns:
+            bool: Return classical error corrected decoded result of measuring this logical qubit in X basis
+        """
         return self.measure(basis='X', return_mode=return_mode, get_operator=get_operator, measurement_error=measurement_error)
 
-    def measureY(self, return_mode=False, get_operator=False, measurement_error=None):
+    def measureY(self, 
+                 return_mode: Optional[bool] = False, 
+                 get_operator: Optional[bool] = False, 
+                 measurement_error: Optional[float] = None):
+        """Interface of logical qubit measurement in Y basis
+
+        Args:
+            return_mode (Optional[bool], optional): If True, will return both corrected codeword and location of error. Defaults to False.
+            get_operator (Optional[bool], optional): If True, will return decoded result and raw result. Defaults to False.
+            measurement_error (Optional[float], optional): Probablity of measurement error to be override physical qubit. Defaults to None.
+
+        Returns:
+            bool: Return classical error corrected decoded result of measuring this logical qubit in Y basis
+        """       
         return self.measure(basis='Y', return_mode=return_mode, get_operator=get_operator, measurement_error=measurement_error)
 
-    def measureZ(self, return_mode=False, get_operator=False, measurement_error=None):
+    def measureZ(self, 
+                 return_mode: Optional[bool] = False, 
+                 get_operator: Optional[bool] = False, 
+                 measurement_error: Optional[float] = None):
+        """Interface of logical qubit measurement in Z basis
+
+        Args:
+            return_mode (Optional[bool], optional): If True, will return both corrected codeword and location of error. Defaults to False.
+            get_operator (Optional[bool], optional): If True, will return decoded result and raw result. Defaults to False.
+            measurement_error (Optional[float], optional): Probablity of measurement error to be override physical qubit. Defaults to None.
+
+        Returns:
+            bool: Return classical error corrected decoded result of measuring this logical qubit in Z basis
+        """    
         return self.measure(basis='Z', return_mode=return_mode, get_operator=get_operator, measurement_error=measurement_error)
 
-    def error_detection_correction(self, protocol='standard', correction=True, return_syndrome=False, perfect_correction=False):
+    def error_detection_correction(self, 
+                                   protocol: Optional[str] = 'standard', 
+                                   correction: Optional[bool] = True, 
+                                   return_syndrome: Optional[bool] = False, 
+                                   perfect_correction: Optional[bool] = False):
+        """Quantum error correction to this logical qubit and reinitialize ancilla qubits too.
+
+        Args:
+            protocol (Optional[str], optional): Protocol for QEC. Defaults to 'standard'.
+            correction (Optional[bool], optional): If False, not apply X or Z gate according to error detected 
+                                                   and not reinitialize ancilla qubits. Defaults to True.
+            return_syndrome (Optional[bool], optional): If True, return syndrome of syndrome measurement both X and Z basis. 
+                                                        Defaults to False.
+            perfect_correction (Optional[bool], optional): If True, perform perfect quantum error correction directly 
+                                                           using classical error correction method. Defaults to False.
+
+        Returns:
+            None: 
+        """
 
         if perfect_correction:
 
@@ -461,6 +565,11 @@ class LogicalQubit:
             return None
 
     def reinitializeAncilla(self):
+        """Reinitialize ancilla qubits
+
+        Returns:
+            None: 
+        """
 
         for qubit in self.ancilla_list:
             qubit.setFree() # <--- May change in the future
@@ -476,8 +585,35 @@ class LogicalQubit:
         return r
 
 class PhysicalQubit:
+    """
+    Module of error tracking based physical qubit 
+    """
+    def __init__(self, 
+                 node1: Any, 
+                 node2: Any, 
+                 qubitID: Any, 
+                 qnic: Any, 
+                 role: Any, 
+                 env: Any, 
+                 table: Any, 
+                 memFunc: Union[Callable, List], 
+                 gate_error: Union[int, float], 
+                 measurementError: Union[int, float]):
+        """The init function of physical qubit.
 
-    def __init__(self, node1, node2, qubitID, qnic, role, env, table, memFunc, gate_error, measurementError):
+        Args:
+            node1 (Any): A node that this qubit is located.
+            node2 (Any): A neighbor node that this qubit is located.
+            qubitID (Any): A part of qubit ID that will be combine with node1.
+            qnic (Any): A quantum network interface caed that this qubit located.
+            role (Any): A role of qubit whether it is external or internal qubit.
+            env (Any): An environment of qubit, should have env.now for calculate probablity of memory error.
+            table (Any): A table that qubit is located.
+            memFunc (Union[Callable, List]): A memory function for qubit.
+            gate_error (Union[int, float]): A propability of gate error of qubit
+            measurementError (Union[int, float]): A propability of measurement error of qubit
+        """
+
         # Simulation setup
         self.env = env
         self.table = table
@@ -498,6 +634,9 @@ class PhysicalQubit:
         self.setFree()
 
     def setFree(self):
+        """
+        Method that reset status of the qubit
+        """
         self.isBusy = False
         self.partner = None
         self.partnerID = None
@@ -520,20 +659,49 @@ class PhysicalQubit:
         return self.photonPair
 
     def setInitialTime(self):
+        """
+        Method for initial time for qubit
+
+        Returns:
+            None: 
+        """
         self.initiateTime = self.env.now
         self.last_gate_time = self.initiateTime 
         return None
 
 
     def addXerror(self):
+        """
+        Add Pauli-X error to the qubit
+
+        Returns:
+            None: 
+        """
         self.error_x = not self.error_x
         return None
 
     def addZerror(self):
+        """
+        Add Pauli-Z error to the qubit
+
+        Returns:
+            None: 
+        """
         self.error_z = not self.error_z
         return None
 
-    def applySingleQubitGateError(self, prob=None):
+    def applySingleQubitGateError(self, prob: Optional[List] = None):
+        """
+        Apply single-qubit gate error to the qubit with some probablity
+
+        Args:
+            prob (Optional[List], optional): If prob is provied, it will 
+                                             be used as distribution for apply Pauli error. 
+                                             Defaults to None.
+
+        Returns:
+            None: 
+        """
         if prob is None:
             prob = self.memoryProbVector
         error_choice = random.choices(['I', 'X', 'Z', 'Y'], weights=prob)[0]
@@ -556,9 +724,19 @@ class PhysicalQubit:
 
         return None
 
-    def measureX(self, get_operator=False, measurement_error=None):
-        #self.applyMemoryError2()
-        # self.applySingleQubitGateError()
+    def measureX(self, get_operator: Optional[bool] = False, measurement_error: Optional[float] = None):
+        """
+        Apply measurement error to qubit then, measure qubit in X-basis.
+
+        Args:
+            get_operator (Optional[bool], optional): If True, will return also an integer indicate a Pauli error on qubit. 
+                                                     Defaults to False.
+            measurement_error (Optional[float], optional): measurement error to override the qubit default. Defaults to None.
+
+        Returns:
+            bool: Whether there is bit-flip error in X-basis or not.
+        """
+
         self.applySingleQubitGateError(self.memoryFunc(self.env.now - self.initiateTime))
 
         if get_operator:
@@ -579,9 +757,19 @@ class PhysicalQubit:
             self.error_z = not self.error_z if meas_error > random.random() else self.error_z
             return self.error_z # not
 
-    def measureZ(self, get_operator=False, measurement_error=None):
-        # self.applyMemoryError2()
-        # self.applySingleQubitGateError()
+    def measureZ(self, get_operator: Optional[bool] = False, measurement_error: Optional[float] = None):
+        """
+        Apply measurement error to qubit then, measure qubit in Z-basis.
+
+        Args:
+            get_operator (Optional[bool], optional): If True, will return also an integer indicate a Pauli error on qubit. 
+                                                     Defaults to False.
+            measurement_error (Optional[float], optional): measurement error to override the qubit default. Defaults to None.
+
+        Returns:
+            bool: Whether there is bit-flip error in Z-basis or not.
+        """
+
         self.applySingleQubitGateError(self.memoryFunc(self.env.now - self.initiateTime))
 
         if get_operator:
@@ -603,10 +791,18 @@ class PhysicalQubit:
             self.error_x = not self.error_x if meas_error > random.random() else self.error_x
             return self.error_x # not
 
-    def measureY(self, get_operator=False, measurement_error=None):
+    def measureY(self, get_operator: Optional[bool] = False, measurement_error: Optional[float] = None):
+        """
+        Apply measurement error to qubit then, measure qubit in Y-basis.
 
-        #self.applyMemoryError2()
-        #self.applySingleQubitGateError()
+        Args:
+            get_operator (Optional[bool], optional): If True, will return also an integer indicate a Pauli error on qubit. 
+                                                     Defaults to False.
+            measurement_error (Optional[float], optional): measurement error to override the qubit default. Defaults to None.
+
+        Returns:
+            bool: Whether there is bit-flip error in Y-basis or not.
+        """
 
         self.applySingleQubitGateError(self.memoryFunc(self.env.now - self.initiateTime))
 
@@ -634,7 +830,19 @@ class PhysicalQubit:
             error = not error if meas_error > random.random() else error
             return error
 
-    def measure(self, basis, get_operator=False, measurement_error=None):
+    def measure(self, basis: str, get_operator: Optional[bool] = False, measurement_error: Optional[float] = None):
+        """
+        Interface for apply measurement error and measure qubit in particular basis.
+
+        Args:
+            basis (str): basis for qubit to be measured.
+            get_operator (Optional[bool], optional): If True, will return also an integer indicate a Pauli error on qubit. 
+                                                     Defaults to False.
+            measurement_error (Optional[float], optional): measurement error to override the qubit default. Defaults to None.
+
+        Returns:
+            bool: Whether there is bit-flip error in measured basis or not.
+        """
 
         if basis in ['Z', 'z']:
             results = self.measureZ(get_operator=get_operator, measurement_error=measurement_error)
@@ -647,8 +855,17 @@ class PhysicalQubit:
 
         return results
 
-    def I_gate(self, gate_error=None, mem_model=False):
+    def I_gate(self, gate_error: Optional[float] = None, mem_model: Optional[bool] = False):
+        """
+        Apply Identity gate to qubit, with some probablity apply depolarizing channel instead.
 
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+            mem_model (Optional[bool], optional): Memory model to be used, Currently not implemented. Defaults to False.
+
+        Returns:
+            None: 
+        """
         # Apply Pauli error piror to application of gate depend on time
         if mem_model:
             pass
@@ -669,7 +886,16 @@ class PhysicalQubit:
     
         return None
 
-    def H_gate(self, gate_error=None):
+    def H_gate(self, gate_error: Optional[float] = None):
+        """
+        Apply Hadamard gate to qubit, with some probablity apply depolarizing channel instead.
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+
+        Returns:
+            None:
+        """
         
         g_e = self.gate_error if gate_error is None else gate_error
         if (1 - g_e) > random.random():
@@ -688,7 +914,16 @@ class PhysicalQubit:
     
         return None
 
-    def X_gate(self, gate_error=None):
+    def X_gate(self, gate_error: Optional[float] = None):
+        """
+        Apply Pauli-X gate to qubit, with some probablity apply depolarizing channel instead.
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+
+        Returns:
+            None:
+        """
         
         g_e = self.gate_error if gate_error is None else gate_error
         if (1 - g_e) > random.random():
@@ -707,7 +942,16 @@ class PhysicalQubit:
     
         return None
     
-    def Z_gate(self, gate_error=None):
+    def Z_gate(self, gate_error: Optional[float] = None):
+        """
+        Apply Pauli-Z gate to qubit, with some probablity apply depolarizing channel instead.
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+
+        Returns:
+            None:
+        """
         
         g_e = self.gate_error if gate_error is None else gate_error
         if (1 - g_e) > random.random():
@@ -726,7 +970,16 @@ class PhysicalQubit:
     
         return None
 
-    def S_dagger_gate(self, gate_error=None):
+    def S_dagger_gate(self, gate_error: Optional[float] = None):
+        """
+        Apply S gate to qubit, with some probablity apply depolarizing channel instead.
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+
+        Returns:
+            None:
+        """
 
         g_e = self.gate_error if gate_error is None else gate_error
         if (1 - g_e) > random.random():
@@ -747,7 +1000,16 @@ class PhysicalQubit:
 
         return None
 
-    def S_gate(self, gate_error=None):
+    def S_gate(self, gate_error: Optional[float] = None):
+        """
+        Apply S gate to qubit, with some probablity apply depolarizing channel instead.
+
+        Args:
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+
+        Returns:
+            None:
+        """
 
         g_e = self.gate_error if gate_error is None else gate_error
         if (1 - g_e) > random.random():
@@ -758,7 +1020,17 @@ class PhysicalQubit:
 
         return None
 
-    def CNOT_gate(self, control_qubit, gate_error=None):
+    def CNOT_gate(self, control_qubit: Any,  gate_error: Optional[float] = None):
+        """
+        Apply CNOT gate to qubit as a target, with some probablity apply depolarizing channel instead.
+
+        Args:
+            control_qubit (Any): Control qubit for CNOT gate
+            gate_error (Optional[float], optional): Probablity of gate error to be overried qubit default. Defaults to None.
+
+        Returns:
+            None:
+        """
         
         g_e = self.gate_error if gate_error is None else gate_error
         if (1 - g_e) > random.random():
@@ -788,52 +1060,6 @@ class PhysicalQubit:
             control_qubit.applySingleQubitGateError(prob=[0.25, 0.25, 0.25, 0.25])
         
         return None
-
-    def Xpurify(self, resource_qubit):
-
-        self.CNOT_gate(resource_qubit)
-        return self.measureZ()
-
-    def Zpurify(self, resource_qubit):
-
-        self.CNOT_gate(resource_qubit)
-        self.H_gate()
-        return self.measureZ()
-
-    def applyMemoryError(self):
-
-        P_I, P_X, P_Y, P_Z = self.memoryErrorRate[0], self.memoryErrorRate[1], self.memoryErrorRate[2], self.memoryErrorRate[3]
-        transitionMatrix = np.array([[P_I, P_X, P_Y, P_Z],
-                                     [P_X, P_I, P_Z, P_Y],
-                                     [P_Y, P_Z, P_I, P_X],
-                                     [P_Z, P_Y, P_X, P_I]])
-
-        transitionMatrix = fractional_matrix_power(transitionMatrix, self.env.now - self.initiateTime)
-        self.memoryProbVector = np.matmul(self.memoryProbVector, transitionMatrix)
-        self.initiateTime = self.env.now
-
-        return None
-
-    def applyMemoryError2(self):
-
-        # Update self.memoryProbVector according to self.memoryFunc
-        self.memoryProbVector = self.memoryFunc(self.env.now - self.initiateTime)
-
-        return None
-
-    def measureForFidelity(self, method=None, basis=None):
-        self.applyMemoryError2()
-        self.applySingleQubitGateError()
-
-        result = 0
-        if self.error_x and self.error_z: # X Z
-            result = 1 
-        elif self.error_x and not self.error_z: # X
-            result = 2
-        elif self.error_z and not self.error_x: # Z
-            result = 3
-
-        return result
 
 class PhotonPair:
 

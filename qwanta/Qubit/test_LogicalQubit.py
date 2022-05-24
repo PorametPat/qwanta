@@ -34,28 +34,6 @@ class TestLogicalQubit(unittest.TestCase):
                 self.assertEqual(qubit.error_x, True)
             else:
                 self.assertEqual(qubit.error_x, False)
-    
-    def test_measure_getOperators(self):
-        # test for perfect get all operators from each physical qubits
-        result = self.logicalQubit.measureForFidelity(method='get_operator')
-        self.assertEqual(result, [0 for _ in range(7)])
-
-    def test_measure_getLogicalOperator(self):
-        # Using perfect decode to get logical operator
-        result = self.logicalQubit.measureForFidelity(method='get_logicalOperator')
-        self.assertEqual(result, 'II')
-
-        for index, qubit in enumerate(self.logicalQubit.physical_list):
-            if index in [0, 1, 2, 4]:
-                qubit.error_x = True
-        result = self.logicalQubit.measureForFidelity(method='get_logicalOperator')
-        self.assertEqual(result, 'XI')
-
-        for index, qubit in enumerate(self.logicalQubit.physical_list):
-            if index in [0, 1, 2, 4]:
-                qubit.error_z = True
-        result = self.logicalQubit.measureForFidelity(method='get_logicalOperator')
-        self.assertEqual(result, 'XZ')
 
     def test_measure_steane_standard_correctable_error_Z(self):
 
