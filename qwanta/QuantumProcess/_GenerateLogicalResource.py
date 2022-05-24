@@ -3,10 +3,36 @@ import networkx as nx
 import numpy as np
 import uuid
 from ..Qubit import LogicalQubit
+from typing import Any, Optional, Dict
 
 class Mixin:
 
-    def PrototypeGenerateLogicalResource(self, process, node1, node2, num_required=1, label_in='Physical', label_out='Logical', protocol='Non-local CNOT'):
+    def GenerateLogicalResource(self, 
+                                         process: Dict, 
+                                         node1: Any, 
+                                         node2: Any, 
+                                         num_required: Optional[int] = 1, 
+                                         label_in: Optional[str] = 'Physical', 
+                                         label_out: Optional[str] = 'Logical', 
+                                         protocol: Optional[str] = 'Non-local CNOT'):
+        """This process will not induce any time delay, hence when `label_in` resources are available,
+           it will fire an independent process for producing logical Bell pair which perform actual protocol.
+
+        Args:
+            process (Dict): Dictionary of contain information of process.
+            node1 (Any): node 1 which this process is process.
+            node2 (Any): node 2 which this process is process.
+            num_required (Optional[int], optional): Number of time that this process needed to looped. Defaults to 1.
+            label_in (Optional[str], optional): Input label of resource. Defaults to 'Physical'.
+            label_out (Optional[str], optional): Output label of resource. Defaults to 'Logical'.
+            protocol (Optional[str], optional): Protocol used for generation of logical Bell pair. Defaults to 'Non-local CNOT'.
+
+        Raises:
+            ValueError: Physical qubits that used to encode is not unique.
+
+        Yields:
+            _type_: _description_
+        """
 
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)

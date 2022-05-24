@@ -1,8 +1,33 @@
 import simpy 
+from typing import List, Union, Any, Optional, Dict
 
 class Mixin:
 
-    def PrototypePurification(self, process, node1, node2, num_required=1, label_in='Physical', label_out='Purified',protocol='Ss-Dp', note=None):
+    def Purification(self, 
+                              process: Dict, 
+                              node1: Any, 
+                              node2: Any, 
+                              num_required: Optional[int] = 1, 
+                              label_in: Optional[str] = 'Physical', 
+                              label_out: Optional[str] = 'Purified',
+                              protocol: Optional[str] = 'Ss-Dp',
+                              note: Optional[Union[str, List]] = None):
+        """This process will not induce any time delay, hence when `label_in` resources are available,
+           it will fire an independent process for purification which perform actual protocol.
+
+        Args:
+            process (Dict): Dictionary of contain information of process.
+            node1 (Any): node 1 which this process is process.
+            node2 (Any): node 2 which this process is process.
+            num_required (Optional[int], optional): Number of time that this process needed to looped. Defaults to 1.
+            label_in (Optional[str], optional): Input label of resource. Defaults to 'Physical'.
+            label_out (Optional[str], optional): Output label of resource. Defaults to 'Purified'.
+            protocol (Optional[str], optional): Protocol used for entanglement purification. Defaults to 'Ss-Dp'.
+            note (Optional[Union[str, List]], optional): Addition note for process. Defaults to None.
+
+        Yields:
+            _type_: _description_
+        """
 
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
@@ -20,8 +45,6 @@ class Mixin:
                 event = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[0]), 
                                                      table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[1]),
                                                      table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[2])])
-
-                # Separate here?
 
                 Bells = []
                 for i in range(3):

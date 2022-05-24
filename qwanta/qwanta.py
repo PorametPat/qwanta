@@ -1,34 +1,48 @@
+from optparse import Option
+import os 
+from typing import List, Dict, Union, Any, Callable, Optional
+import random
+import ast
+
 import simpy
 import networkx as nx
-from .Qubit.qubit import PhysicalQubit
-import os 
-import pandas as pd
-import seaborn as sns
-import dill
-import ast
-from tqdm.notebook import tqdm
-import matplotlib.pyplot as plt
-from pyvis.network import Network
-import random
 import numpy as np
+import pandas as pd
+import dill
+from pyvis.network import Network
 
+from .Qubit.qubit import PhysicalQubit, LogicalQubit
 from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _VirtualStateTomography
 from .SubProcess import _TimeLag
 
 
 class Xperiment:
 
-    def __init__(self, timelines_path, 
-                       nodes_info_exp, 
-                       edges_info_exp, 
-                       gate_error=0,
-                       measurement_error=0,
-                       memory_time=1,
-                       strategies_list=None, 
-                       resources_dict=None,
-                       experiment=None,
-                       sim_time=None,
+    def __init__(self, timelines_path: str, 
+                       nodes_info_exp: Dict, 
+                       edges_info_exp: Dict, 
+                       gate_error: Union[int, float] = 0,
+                       measurement_error: Union[int, float] = 0,
+                       memory_time: Union[int, float] = 1,
+                       strategies_list: Optional[List] = None, 
+                       resources_dict: Optional[Dict] = None,
+                       experiment: Optional[Any] = None,
+                       sim_time: Union[int, float] = None,
                 ):
+        """Init of Xperiment
+
+        Args:
+            timelines_path (str): Path to excel file containing resource-process flow
+            nodes_info_exp (Dict): Information of nodes in network topology
+            edges_info_exp (Dict): Information of edges in network topology
+            gate_error (Union[int, float], optional): Probablity of gate error to be validate. Defaults to 0.
+            measurement_error (Union[int, float], optional): Probablity of measurement error to be validate. Defaults to 0.
+            memory_time (Union[int, float], optional): Memory time of qubit to be validate. Defaults to 1.
+            strategies_list (Optional[List], optional): List of strategies to be simulated as a sheet names. Defaults to None.
+            resources_dict (Optional[Dict], optional): Dictionary of resource in each QNICs. Defaults to None.
+            experiment (Optional[Any], optional): Name of file for result to be added. Defaults to None.
+            sim_time (Union[int, float], optional): Time in simulation allowed for simulation to execute for each strategies. Defaults to None.
+        """
 
         if isinstance(strategies_list, str):
             strategies_list = [strategies_list]
@@ -86,12 +100,12 @@ class Xperiment:
         
         self.configurations = {
             exp : Configuration(
-                topology = self.edges_info_exp[exp], 
+                edges_info = self.edges_info_exp[exp], 
                 timeline = self.timelines[exp], 
                 nodes_info = self.nodes_info_exp[exp], 
-                memFunc = self.memory_functions[exp], 
+                memory_function = self.memory_functions[exp], 
                 gate_error = self.gate_errors[exp], 
-                measurementError = self.measurement_errors[exp],
+                measurement_error = self.measurement_errors[exp],
                 experiment = experiment, # Record experiment set with experiment name
                 message = exp,
                 sim_time = self.sim_times[exp],
@@ -109,7 +123,22 @@ class Xperiment:
         
         self.process_graph = {}
 
-    def validate(self, vis=False, get_table=False, show_message=False):
+    def validate(self, 
+                 vis: Optional[bool] = False, 
+                 get_table: Optional[bool] = False, 
+                 show_message: Optional[bool] = False):
+        """Validation method, checking for error models, resource-process flow. 
+           Currently not validate minimum resources needed for execute.
+
+        Args:
+            vis (Optional[bool], optional): Save html resource-process graph. Defaults to False.
+            get_table (Optional[bool], optional): Show summary table. Defaults to False.
+            show_message (Optional[bool], optional): Print validation message. Defaults to False.
+
+        Returns:
+            bool: If validation is passed or not.
+        """
+
         validate_table = []
         message = ''
 
@@ -407,8 +436,18 @@ class Xperiment:
                 print(message)
             return False
 
-    def execute(self, multithreading=False, save_result=False):
-        
+    def execute(self, 
+                multithreading:Optional[bool] = False, 
+                save_result: Optional[bool] = False):
+        """Execute experiments
+
+        Args:
+            multithreading (Optional[bool], optional): Whether to use multithreading or not. Defaults to False.
+            save_result (Optional[bool], optional): Whether to save simulated result or not. Defaults to False.
+
+        Returns:
+            dict: result dictionary of simulated results.
+        """
         results = {}
         if multithreading:
             
@@ -481,23 +520,51 @@ class Tuner:
         return pd.DataFrame(data)
 
 class Configuration:
-    def __init__(self, topology, timeline, experiment=False, nodes_info=None, memFunc=None, gate_error=None, measurementError=None,
-                 message=None, throughtput_edges=None, label_record=None, num_measured=9000, sim_time=None, 
-                 collectFidelityHistory=False, result_path='result'):
+    def __init__(self, 
+                 edges_info: Dict, 
+                 timeline: List, 
+                 nodes_info: Optional[Dict] = None, 
+                 memory_function: Optional[Union[Callable, List]] = None, 
+                 gate_error: Optional[Union[int, float]] = None, 
+                 measurement_error: Optional[Union[int, float]] = None, 
+                 message:Optional[str] = None, 
+                 throughtput_edges: Optional[List] = None, 
+                 label_record: Optional[Any] = None, 
+                 sim_time: Optional[Union[int, float]] = None, 
+                 collectFidelityHistory: Optional[bool] = False, 
+                 experiment: Optional[bool] = False, 
+                 result_path: Optional[str] = 'result'):
+        
+        """Configuration instance to be feed to `QuantumNetwork`
+
+        Args:
+            edges_info (Dict): Each key is a tuple of nodes form edge.
+            timeline (List): List of process in resource-process flow
+            nodes_info (Optional[Dict], optional): Information of each node. Defaults to None.
+            memory_function (Optional[Union[Callable, List]], optional): Memory function. Defaults to None.
+            gate_error (Optional[Union[int, float]], optional): Probablity of gate error. Defaults to None.
+            measurement_error (Optional[Union[int, float]], optional): Probablity of measurement error. Defaults to None.
+            message (Optional[str], optional): Message to be added for saved simulated result. Defaults to None.
+            throughtput_edges (Optional[List], optional): Edge to be used for connection setup. Defaults to None.
+            label_record (Optional[Any], optional): Label of resource to be recorded. Defaults to None.
+            sim_time (Optional[Union[int, float]], optional): Time in simulation allowed for simulation to execute. Defaults to None.
+            collectFidelityHistory (Optional[bool], optional): Whether to collect fidelity for each measurement or not. Defaults to False.
+            experiment (Optional[bool], optional): Addtion message to be used for saved result. Defaults to False.
+            result_path (Optional[str], optional): Path to use for save simulated result. Defaults to 'result'.
+        """
 
         self.numPhysicalBuffer = 20
         self.numInternalEncodingBuffer = 20
         self.numInternalDetectingBuffer = 10
         self.numInternalInterfaceBuffer = 2
-        self.memFunc = np.inf if memFunc is None else memFunc # Function of memory of qubit
-        self.gateError = 0 if gate_error is None else gate_error
-        self.measurementError = 0 if measurementError is None else measurementError
+        self.memFunc = np.inf if memory_function is None else memory_function # Function of memory of qubit
+        self.gate_error = 0 if gate_error is None else gate_error
+        self.measurement_error = 0 if measurement_error is None else measurement_error
         self.timeline = timeline
         self.experiment = experiment
         self.light_speed_in_fiber = 208189.206944 # km/s
         self.message = message
-        self.num_measured = num_measured
-        self.g = topology
+        self.g = edges_info
         self.result_path = result_path
         self.label_recorded = label_record
         self.collectFidelityHistory = collectFidelityHistory
@@ -506,30 +573,30 @@ class Configuration:
         
         # Initialize graph
         G = nx.Graph()
-        for edge in topology:
+        for edge in edges_info:
 
             for node in edge:
 
-                if node not in topology[edge].keys():
-                    topology[edge][node] = {
-                        'memory function': self.memFunc,
-                        'gate error': self.gateError,
-                        'measurement error': self.measurementError
+                if node not in edges_info[edge].keys():
+                    edges_info[edge][node] = {
+                        'memory function': self.memory_function,
+                        'gate error': self.gate_error,
+                        'measurement error': self.measurement_error
                     }
 
-                if not callable(topology[edge][node]['memory function']):
-                    memory_time = topology[edge][node]['memory function']
+                if not callable(edges_info[edge][node]['memory function']):
+                    memory_time = edges_info[edge][node]['memory function']
                     
                     # Memory error
                     def memory_error_function(time, tau=memory_time):
                         p = 0.75*np.e**(-1*(time/tau)) + 0.25
                         return [p, (1- p)/3, (1- p)/3, (1- p)/3]
 
-                    topology[edge][node]['memory function'] = memory_error_function
+                    edges_info[edge][node]['memory function'] = memory_error_function
 
             G.add_edge(edge[0], edge[1]) 
 
-        nx.set_edge_attributes(G, topology)
+        nx.set_edge_attributes(G, edges_info)
         
 
         # Include function of error model
@@ -555,7 +622,20 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                      _VirtualStateTomography.Mixin,
                      _TimeLag.Mixin):
 
-    def __init__(self, configuration):
+    def __init__(self, configuration: Configuration):
+        """
+        Quantum network instance initialize with configuration instance.
+        The nessesary parameter and setting will be initialize for simulation.
+        
+            1. PhysicalQubit in each QNICs
+            2. self.QubitTables which contain free qubit in each QNICs.
+            3. self.resourceTables which contain entangle resource for each complete-edges.
+            4. Parameter for network benchmarking.
+            5. self.Expectation_value to be used for fidelity estimation.
+
+        Args:
+            configuration (Configuration): Configuration for simulation
+        """
 
         self.configuration = configuration
         self.env = simpy.Environment()
@@ -584,7 +664,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         for table in self.table_name}
 
         for table in self.table_name:
-            for node1, node2, attr in self.graph.edges(data=True): # self.complete_graph.edges() #  
+            for node1, node2, attr in self.graph.edges(data=True):  
                 for i in range(self.table_name[table]):
 
                     self.QubitsTables[table][f'{node1}-{node2}'] \
@@ -635,12 +715,10 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                 else:
                     self.resourceTables[table][f'{node1}-{node2}'] = simpy.FilterStore(self.env) 
 
-        #self.complete_edges_list = list(set(self.complete_edges_list))
-        #self.edges_list = list(set(self.edges_list))
         for process in self.configuration.timeline:
             process['isSuccess'] = 0
 
-        self.simulationLog = [] # <= TODO use this to collect data to plot
+        self.simulationLog = [] 
         self.qubitsLog = []
         self.numResrouceProduced = {
             f'{node1}-{node2}' : {}
@@ -669,16 +747,29 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         self.simulationLog.append(log_message)
         return None
 
-    def createLinkResource(self, node1, node2, resource1, resource2, resource_table, label='Physical', target_node=None, initial=False):
+    def createLinkResource(self, 
+                           node1: str, 
+                           node2: str, 
+                           resource1: Union[PhysicalQubit, LogicalQubit], 
+                           resource2: Union[PhysicalQubit, LogicalQubit],  
+                           resource_table: Dict, 
+                           label: Optional[str] = 'Physical'):
+        """Method to put new entanglement into resource table
+
+        Args:
+            node1 (str): Node 1 containing resource 1
+            node2 (str): Node 2 containing resource 2
+            resource1 (Union[PhysicalQubit, LogicalQubit]): resource 1, one of the Bell pair
+            resource2 (Union[PhysicalQubit, LogicalQubit]): resource 2, one of the Bell pair
+            resource_table (Dict): Dictionary containing dict of each edge of simpy.FilterStore 
+            label (Optional[str], optional): label of the new resource. Defaults to 'Physical'.
+
+        Returns:
+            None: 
+        """
         resource1.isBusy, resource2.isBusy = True, True
         resource1.partner, resource2.partner = resource2, resource1
         resource1.partnerID, resource2.partnerID = resource2.qubitID, resource1.qubitID
-
-        if label == 'Internal':
-            resource1.setInitialTime()
-            resource2.setInitialTime()
-            resource_table[f'{node1}-{node2}'][f'{target_node}'].put((resource1, resource2, 'Internal'))
-            return None
         
         resource_table[f'{node1}-{node2}'].put((resource1, resource2, label))
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
@@ -696,7 +787,19 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
 
         return None
 
-    def validateNodeOrder(self, node1, node2):
+    def validateNodeOrder(self, 
+                          node1: str, 
+                          node2: str):
+        """Method for arrange the right order of node which exist in 
+           self.complete_edges_list which used to create self.resourceTables
+
+        Args:
+            node1 (str): Node 1.
+            node2 (str): Node 2.
+
+        Returns:
+            (str, str): Validated node order.
+        """
 
         if f'{node1}-{node2}' not in self.complete_edges_list:
             node1, node2 = node2, node1
@@ -704,6 +807,22 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         return node1, node2
 
     def Timeline(self):
+        """
+        Core process for simulation.
+        The process consist of the following phase,
+            1. Sending connection setup from self.configuration.throughtputEdges[0]
+               to self.configuration.throughtputEdges[1] and back. The process needed to be finish before next phase.
+            2. It will loop through each process in self.configuration.timeline to start each simulation.
+               The processes will be divided into Limited_process and Unlimited_process. 
+               This phase will finish only if Limited_process is finished.
+            3. The self.connectionSetupTimeStamp will override with (self.env.now - itself).
+
+        Raises:
+            ValueError: Main process is not defined
+
+        Yields:
+            _type_: Successness of process
+        """
 
         connectionSetup = [self.env.process(self.ConnectionSetup(self.configuration.throughtputEdges[0], 
                                                                  self.configuration.throughtputEdges[1]))]
@@ -738,27 +857,27 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                                                   num_required=process['Num Trials'], middleNode=process['Edges'][1]))
                 ]
             elif process['Main Process'] in ['PrototypeEntanglementSwapping', 'Entanglement swapping']:
-                p = [self.env.process(self.PrototypeExternalEntanglementSwapping(process,( process['Edges'][0], process['Edges'][1]), (process['Edges'][1], process['Edges'][2]), \
+                p = [self.env.process(self.ExternalEntanglementSwapping(process,( process['Edges'][0], process['Edges'][1]), (process['Edges'][1], process['Edges'][2]), \
                                                                                 num_required=process['Num Trials'], \
                                                                                 label_in=process['Label in'], \
                                                                                 label_out=process['Label out'], \
                                                                                 resource_type=process['Resource Type'],
                                                                                 note=process['Note']))]    
-            elif process['Main Process'] in ['PrototypeStateTomography', 'State tomography']:
-                p = [self.env.process(self.PrototypeVirtualStateTomography(process, process['Edges'][0], process['Edges'][1], \
+            elif process['Main Process'] in ['PrototypeStateTomography', 'State tomography', 'Fidelity estimation']:
+                p = [self.env.process(self.FidelityEstimation(process, process['Edges'][0], process['Edges'][1], \
                                                                         num_required=process['Num Trials'], \
                                                                         label_in=process['Label in'], \
                                                                         resource_type=process['Resource Type'],
                                                                         note=process['Note']))] 
-            elif process['Main Process'] in ['PrototypePurification', 'Entanglement purification']:
-                p = [self.env.process(self.PrototypePurification(process, process['Edges'][0], process['Edges'][1], 
+            elif process['Main Process'] in ['PrototypePurification', 'Entanglement purification', 'purification']:
+                p = [self.env.process(self.Purification(process, process['Edges'][0], process['Edges'][1], 
                                                        num_required=process['Num Trials'], \
                                                        label_in=process['Label in'], \
                                                        label_out=process['Label out'], \
                                                        protocol=process['Protocol'],
                                                        note=process['Note']))]   
             elif process['Main Process'] in ['PrototypeGenerateLogicalResource', 'Generate logical Bell pair']:
-                p = [self.env.process(self.PrototypeGenerateLogicalResource(process, process['Edges'][0], process['Edges'][1], 
+                p = [self.env.process(self.GenerateLogicalResource(process, process['Edges'][0], process['Edges'][1], 
                                                                   num_required=process['Num Trials'], \
                                                                   label_in=process['Label in'], \
                                                                   label_out=process['Label out'], \
@@ -774,7 +893,19 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
 
         self.connectionSetupTimeStamp = self.env.now - self.connectionSetupTimeStamp
 
-    def run(self, save_tomography=False, save_result=True):
+    def run(self, 
+            save_tomography: Optional[bool] = False, 
+            save_result: Optional[bool] = True):
+        """
+        Execute the simulation and record the result
+
+        Args:
+            save_tomography (Optional[bool], optional): Whether to save separated file for state tomography or not. Defaults to False.
+            save_result (Optional[bool], optional): Whether to save simulated result to file or not. Defaults to True.
+
+        Returns:
+            dict: result of simulation
+        """
 
         timeline = self.env.process(self.Timeline())
         sim_time = timeline if self.configuration.simulation_time is None else self.configuration.simulation_time

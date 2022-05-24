@@ -1,12 +1,23 @@
 from ast import Raise
 import networkx as nx
+from ..Qubit import PhysicalQubit
+from typing import Union, Any, Optional
 
 class Mixin:
 
     '''
     Time lag process
     '''
-    def ConnectionSetup(self, initiator, responder):
+    def ConnectionSetup(self, initiator: Any, responder: Any):
+        """Process for establish setup request
+
+        Args:
+            initiator (Any): initiator node
+            responder (Any): responder node
+
+        Yields:
+            _type_: _description_
+        """
 
         # Send connection setup from initiator to responder
         self.updateLog({'Time': self.env.now, 'Message': f'Send connection request from {initiator} to {responder}'})
@@ -21,52 +32,65 @@ class Mixin:
         self.connectionSetupTimeStamp = self.env.now
         self.FidelityEstimationTimeStamp = self.env.now
 
-    def classicalCommunication(self, source, destination, factor=1):
+    def classicalCommunication(self, source: Any, destination: Any, factor: Optional[Union[float, int]]=1):
+        """This process will induce delay for comminucation from source to target node.
+
+        Args:
+            source (Any): source of message to be sent.
+            destination (Any): reciever of message.
+            factor (Optional[Union[float, int]], optional): factor to be multiply to the time required to the light speed. Defaults to 1.
+
+        Yields:
+            _type_: _description_
+        """
+        
         # Calculate time from distance, in this case simply using edges as a traveling time 
-        # self.env.timeout(0)
-
         path = nx.dijkstra_path(self.graph, source, destination)
         for i in range(len(path)-1):
+
+            # Update time required to travel to adjacent ndoe of every edges
             for u, v, w in self.graph.edges(data=True):
                 w['weight'] = self.getDistance(u, v) / self.graph[u][v]['light speed']
+        
+            # Induce the time delay
             yield self.env.timeout(factor*nx.dijkstra_path_length(self.graph, path[i], path[i+1]))
 
-        '''
-        for i in range(len(path)-1):
-            for u, v, w in self.graph.edges(data=True):
-                w['weight'] = self.getDistance(u, v) / self.graph[u][v]['light speed']
-            self.graph.edges()
-            yield self.env.timeout(factor*nx.dijkstra_path_length(self.graph, path[i], path[i+1]))
-        '''
+    def photonTravelingProcess(self, source: Any, destination: Any):
+        """This process will induce delay for comminucation from source to target node.
 
-        '''
-        # Recalculate time to travel
-        for u, v, w in self.graph.edges(data=True):
-            w['weight'] = self.getDistance(u, v) / self.graph[u][v]['light speed']
+        Args:
+            source (Any): Source of the photon
+            destination (Any): Destination node of photon
 
-        #yield self.env.timeout(self.getTimeToTravel(source, destination))
-        yield self.env.timeout(factor*nx.dijkstra_path_length(self.graph, source, destination))
-        '''
-
-    def photonTravelingProcess(self, source, destination):
+        Yields:
+            _type_: _description_
+        """
+        
         # Calculate time from distance, in this case simply using edges as a traveling time
-        # self.env.timeout(1)
         path = nx.dijkstra_path(self.graph, source, destination)
         for i in range(len(path)-1):
+            
+            # Update time required to travel to adjacent ndoe of every edges
             for u, v, w in self.graph.edges(data=True):
                 w['weight'] = self.getDistance(u, v) / self.graph[u][v]['light speed']
+            
+            # Induce the time delay
             yield self.env.timeout(nx.dijkstra_path_length(self.graph, path[i], path[i+1]))
 
-        '''
-        # Recalculate time to travel
-        for u, v, w in self.graph.edges(data=True):
-            w['weight'] = self.getDistance(u, v) / self.graph[u][v]['light speed']
+    def returnToQubitTable(self, qubit: PhysicalQubit):
+        """Process that induce time to send message to neighbor node of the qubit to be put back to `self.QubitTables`.
 
-        #yield self.env.timeout(self.getTimeToTravel(source, destination))
-        yield self.env.timeout(nx.dijkstra_path_length(self.graph, source, destination))
-        '''
+        Args:
+            qubit (PhysicalQubit): physical qubit to be put to back to `self.QubitTables`.
+                                   If its role is external, then delay will be induced.
+                                   If its role is internal, then no delay is induced.
 
-    def returnToQubitTable(self, qubit):
+        Raises:
+            ValueError: Invalid type of qubit's role
+
+        Yields:
+            _type_: _description_
+        """
         if qubit.role == 'external':
             # Send classical message to neighbor first 
             yield self.env.process(self.classicalCommunication(qubit.qubit_node_address, qubit.qubit_neighbor_address))

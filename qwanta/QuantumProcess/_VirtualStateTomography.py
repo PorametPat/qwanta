@@ -1,8 +1,36 @@
+from optparse import Option
 import simpy 
+from typing import Dict, Any, Optional, Union, List
 
 class Mixin:
 
-    def PrototypeVirtualStateTomography(self, process, node1, node2, num_required=10000, label_in='Physical',resource_type='Physical', note=None):
+    def FidelityEstimation(self, 
+                           process: Dict, 
+                           node1: Any, 
+                           node2: Any, 
+                           num_required: Optional[int]=10000, 
+                           label_in: Optional[str] = 'Physical',
+                           resource_type: Optional[str] = 'Physical', 
+                           note: Optional[Union[str, List]] = None):
+        """This process will not induce any time delay, hence when `label_in` resources are available,
+           it will fire an independent process for fidelity estimation which perform actual protocol.
+
+        Args:
+            process (Dict): Dictionary of contain information of process.
+            node1 (Any): node 1 which this process is process.
+            node2 (Any): node 2 which this process is process.
+            num_required (Optional[int], optional): Number of time that this process needed to looped. Defaults to 10000.
+            label_in (Optional[str], optional): Input label of resource. Defaults to 'Physical'.
+            resource_type (Optional[str], optional): Type of resource to be used in operation. Defaults to 'Physical'.
+            note (Optional[Union[str, List]], optional): Addition note for process. Defaults to None.
+
+        Raises:
+            ValueError: Qubits used for fidelity estimation are the same
+            ValueError: Qubits used for fidelity estimation are in the same address
+
+        Yields:
+            _type_: _description_
+        """
 
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
@@ -19,16 +47,16 @@ class Mixin:
             Bell = yield table[f'{node1}-{node2}'].get(lambda bell: bell[2]==label_in)
 
             if Bell[0] == Bell[1]:
-                raise ValueError('Qubits used for tomography are the same')
+                raise ValueError('Qubits used for fidelity estimation are the same')
 
             if Bell[0].qubit_node_address != node1 or Bell[1].qubit_node_address != node2:
-                raise ValueError('Qubits used for tomography are in the same address')
+                raise ValueError('Qubits used for fidelity estimation are in the same address')
             
             info = (Bell, node1, node2, resource_type, process, num_required, num_measure_per_stab, note)
 
-            self.env.process(self._independentVirtualStateTomography(info))
+            self.env.process(self._independentFidelityEstimation(info))
             
-    def _independentVirtualStateTomography(self, info):
+    def _independentFidelityEstimation(self, info):
 
         Bell, node1, node2, resource_type, process, num_required, num_measure_per_stab, note = info
 

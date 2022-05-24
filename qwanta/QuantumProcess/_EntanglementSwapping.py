@@ -1,6 +1,7 @@
 import simpy 
 import networkx as nx
 import numpy as np
+from typing import List, Union, Optional, Dict
 
 class Mixin:
     def InternalEntanglementSwapping(self):
@@ -25,7 +26,31 @@ class Mixin:
     # To let it independently process just have moniter while True moniter 
     # Bell pair and troll it to another processing process
 
-    def PrototypeExternalEntanglementSwapping(self, process, edge1, edge2, num_required=1, label_in='Physical', label_out='Physical', resource_type='Physical', note=None):
+    def ExternalEntanglementSwapping(self, 
+                                              process: Dict, 
+                                              edge1: List, 
+                                              edge2: List, 
+                                              num_required: Optional[int] = 1, 
+                                              label_in: Optional[str] = 'Physical', 
+                                              label_out: Optional[str] = 'Physical', 
+                                              resource_type: Optional[str] = 'Physical', 
+                                              note: Optional[Union[str, List]] = None):
+        """This process will not induce any time delay, hence when `label_in` resources are available,
+           it will fire an independent process for entanglement swapping which perform actual protocol.
+
+        Args:
+            process (Dict): Dictionary of contain information of process.
+            edge1 (List): edge 1 which this process is process.
+            edge2 (List): edge 2 which this process is process.
+            num_required (Optional[int], optional): Number of time that this process needed to looped. Defaults to 1.
+            label_in (Optional[str], optional): Input label of resource. Defaults to 'Physical'.
+            label_out (Optional[str], optional): Output label of resource. Defaults to 'Purified'.
+            resource_type (Optional[str], optional): Type of resource to be used in operation. Defaults to 'Ss-Dp'.
+            note (Optional[Union[str, List]], optional): Addition note for process. Defaults to None.
+
+        Yields:
+            _type_: _description_
+        """
 
         leftNode = edge1[0]; swapper = edge1[1]; rightNode = edge2[1]
 
@@ -153,19 +178,8 @@ class Mixin:
             yield self.env.process(self.classicalCommunication(swapper, rightNode))
         else:
             yield self.env.process(self.classicalCommunication(swapper, leftNode))
-
-        '''
-        # Error propagate via correction operation, to do the right wrong >~<
-        if not left_result and right_result: # 0 1
-            Bell_right[1].X_gate()
-        elif left_result and not right_result: # 1 0 
-            Bell_right[1].Z_gate()
-        elif left_result and right_result: # 1 1
-            Bell_right[1].Z_gate()
-            Bell_right[1].X_gate()
-        '''
         
-        # Or prehap? # Perfect error propagation.
+        # Perfect error propagation.
         if left_result:
             Bell_right[1].Z_gate(gate_error=0)
         if right_result:
