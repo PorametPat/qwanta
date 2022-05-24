@@ -12,7 +12,7 @@ import dill
 from pyvis.network import Network
 
 from .Qubit.qubit import PhysicalQubit, LogicalQubit
-from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _VirtualStateTomography
+from .QuantumProcess import _EntanglementPurification, _EntanglementSwapping, _GenerateLogicalResource, _GeneratePhyscialResource, _FidelityEstimation
 from .SubProcess import _TimeLag
 
 
@@ -619,7 +619,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                      _EntanglementPurification.Mixin, 
                      _EntanglementSwapping.Mixin, 
                      _GenerateLogicalResource.Mixin, 
-                     _VirtualStateTomography.Mixin,
+                     _FidelityEstimation.Mixin,
                      _TimeLag.Mixin):
 
     def __init__(self, configuration: Configuration):
