@@ -17,13 +17,9 @@ setup(
             'networkx',
             'simpy',
             'pandas',
-            'seaborn',
             'dill',
-            'tqdm',
-            'matplotlib',
             'pyvis',
             'numpy',
-            'scipy',
             'geopy',
             'sympy',
         ], # add any additional packages that 
