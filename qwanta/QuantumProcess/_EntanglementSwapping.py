@@ -59,27 +59,16 @@ class Mixin:
 
 
         if resource_type == 'Physical':
-            # table = self.resourceTables['physicalResourceTable']
             table = 'physicalResourceTable'
         elif resource_type == 'Logical':
-            # table = self.resourceTables['logicalResourceTable']
             table = 'logicalResourceTable'
         
         while process['isSuccess'] < num_required: 
-
-            # Just in case, validate order of node agian 
-            # Case: (swapping-leftNode) (swapping-RightNode)
-            tmp_left, tmp_swapping_left = self.validateNodeOrder(leftNode, swapper)
-            tmp_swapping_right, tmp_right = self.validateNodeOrder(swapper, rightNode)
 
             if type(label_in) is str:
                 label_in = [label_in]*2
 
             # get Bell pairs
-            '''
-            event = yield simpy.AllOf(self.env, [table[f'{tmp_left}-{tmp_swapping_left}'].get(lambda bell: bell[2]==label_in[0]), 
-                                                 table[f'{tmp_swapping_right}-{tmp_right}'].get(lambda bell: bell[2]==label_in[1])])
-            '''
             event = yield simpy.AllOf(self.env, [self.resourceTables[leftNode][swapper][table].get(lambda bell: bell[2]==label_in[0]), 
                                                  self.resourceTables[swapper][rightNode][table].get(lambda bell: bell[2]==label_in[1])])
 

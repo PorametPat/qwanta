@@ -32,7 +32,6 @@ class Mixin:
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
 
-        # table = self.resourceTables['physicalResourceTable']
         table = 'physicalResourceTable'
 
         while process['isSuccess'] < num_required:
@@ -42,11 +41,7 @@ class Mixin:
 
                 if type(label_in) is str:
                     label_in = [label_in]*3
-                '''
-                event = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[0]), 
-                                                     table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[1]),
-                                                     table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[2])])
-                '''
+
                 event = yield simpy.AllOf(self.env, [self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in[0]), 
                                                      self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in[1]),
                                                      self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in[2])])
@@ -61,10 +56,7 @@ class Mixin:
 
                 if type(label_in) is str:
                     label_in = [label_in]*2
-                '''
-                event = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[0]), 
-                                                     table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in[1])])
-                '''
+
                 event = yield simpy.AllOf(self.env, [self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in[0]), 
                                                      self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in[1])])
                 

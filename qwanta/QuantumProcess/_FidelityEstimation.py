@@ -36,17 +36,14 @@ class Mixin:
         node1, node2 = self.validateNodeOrder(node1, node2)
 
         if resource_type == 'Physical':
-            #table = self.resourceTables['physicalResourceTable']
             table = 'physicalResourceTable'
         elif resource_type == 'Logical':
-            #table = self.resourceTables['logicalResourceTable']
             table = 'logicalResourceTable'
         
         num_measure_per_stab = int(num_required/3)
 
         while process['isSuccess'] < num_required:
 
-            #Bell = yield table[f'{node1}-{node2}'].get(lambda bell: bell[2]==label_in)
             Bell = yield self.resourceTables[node1][node2][table].get(lambda bell: bell[2]==label_in)
 
             if Bell[0] == Bell[1]:

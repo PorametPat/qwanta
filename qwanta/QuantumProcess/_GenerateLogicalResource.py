@@ -37,9 +37,6 @@ class Mixin:
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
 
-        #table = self.resourceTables['physicalResourceTable']
-        #result_table = self.resourceTables['logicalResourceTable']
-
         table = 'physicalResourceTable'
         result_table = 'logicalResourceTable'
 
@@ -49,7 +46,6 @@ class Mixin:
                 # Non-local CNOT style
 
                 # Get physical Bell pairs
-                # event_external = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in) for _ in range(7)])
                 event_external = yield simpy.AllOf(self.env, [self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in) for _ in range(7)])
                 Bells = []
                 for bell in range(7):
