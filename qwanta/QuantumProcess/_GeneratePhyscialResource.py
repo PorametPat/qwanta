@@ -348,9 +348,9 @@ class Mixin:
                                 num_required: Optional[int] = 1, 
                                 middleNode: Optional[Any] = None):
         """Check the result, 
-                If True, then apply depolarizing error to the matter qubits on each node and register the new resource.
-                If False, Set qubit free and return qubit to the self.QubitTables, as both nodes know that result is failed
-                          then no delay time is needed to induced to notify thier neighbor node.
+           If True, then apply depolarizing error to the matter qubits on each node and register the new resource.
+           If False, Set qubit free and return qubit to the self.QubitTables, as both nodes know that result is failed
+           then no delay time is needed to induced to notify thier neighbor node.
            
 
         Args:

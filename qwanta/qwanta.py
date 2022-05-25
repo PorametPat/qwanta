@@ -1,4 +1,3 @@
-from optparse import Option
 import os 
 from typing import List, Dict, Union, Any, Callable, Optional
 import random
@@ -806,15 +805,11 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         return node1, node2
 
     def Timeline(self):
-        """
-        Core process for simulation.
-        The process consist of the following phase,
-            1. Sending connection setup from self.configuration.throughtputEdges[0]
-               to self.configuration.throughtputEdges[1] and back. The process needed to be finish before next phase.
-            2. It will loop through each process in self.configuration.timeline to start each simulation.
-               The processes will be divided into Limited_process and Unlimited_process. 
-               This phase will finish only if Limited_process is finished.
-            3. The self.connectionSetupTimeStamp will override with (self.env.now - itself).
+        """Core process for simulation.
+           The process consist of the following phase,
+                1. Sending connection setup from self.configuration.throughtputEdges[0] to self.configuration.throughtputEdges[1] and back. The process needed to be finish before next phase.
+                2. It will loop through each process in self.configuration.timeline to start each simulation. The processes will be divided into Limited_process and Unlimited_process. This phase will finish only if Limited_process is finished.
+                3. The self.connectionSetupTimeStamp will override with (self.env.now - itself).
 
         Raises:
             ValueError: Main process is not defined
