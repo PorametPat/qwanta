@@ -382,7 +382,8 @@ class Mixin:
                 freeQubitNode2.applySingleQubitGateError(prob=error_dis)
             
                 # Update resource and set busy to true
-                self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out)
+                # self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, self.resourceTables['physicalResourceTable'], label=label_out)
+                self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, 'physicalResourceTable', label=label_out)
                 
                 if not isinstance(num_required, bool):
                     isSuccess += 1

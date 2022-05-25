@@ -702,7 +702,7 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
             'internalSecondPurifiedResourceTable',
             'logicalResourceTable'
         ]
-
+        '''
         self.resourceTables = {}
         for table in self.resource_table_name:
             self.resourceTables[table] = {}
@@ -714,6 +714,18 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                     }
                 else:
                     self.resourceTables[table][f'{node1}-{node2}'] = simpy.FilterStore(self.env) 
+        '''
+
+        self.resourceTables = nx.complete_graph(self.graph.nodes)
+        for node1, node2 in self.resourceTables.edges():
+            for table in self.resource_table_name:
+                if table[:8] == 'internal':
+                    self.resourceTables[node1][node2][table] = {
+                        f'{node1}' : simpy.FilterStore(self.env),
+                        f'{node2}' : simpy.FilterStore(self.env),
+                    }
+                else:
+                    self.resourceTables[node1][node2][table] = simpy.FilterStore(self.env)
 
         for process in self.configuration.timeline:
             process['isSuccess'] = 0
@@ -771,7 +783,8 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
         resource1.partner, resource2.partner = resource2, resource1
         resource1.partnerID, resource2.partnerID = resource2.qubitID, resource1.qubitID
         
-        resource_table[f'{node1}-{node2}'].put((resource1, resource2, label))
+        # resource_table[f'{node1}-{node2}'].put((resource1, resource2, label))
+        self.resourceTables[node1][node2][resource_table].put((resource1, resource2, label))
         # self.updateLog({'Time': self.env.now, 'Message': f'Qubit ({resource1.qubitID}) entangle with Qubit ({resource2.qubitID})'})
 
         if label in self.configuration.label_recorded:

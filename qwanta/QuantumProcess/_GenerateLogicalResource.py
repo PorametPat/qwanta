@@ -37,8 +37,11 @@ class Mixin:
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
 
-        table = self.resourceTables['physicalResourceTable']
-        result_table = self.resourceTables['logicalResourceTable']
+        #table = self.resourceTables['physicalResourceTable']
+        #result_table = self.resourceTables['logicalResourceTable']
+
+        table = 'physicalResourceTable'
+        result_table = 'logicalResourceTable'
 
         while process['isSuccess'] < num_required: 
                 
@@ -46,7 +49,8 @@ class Mixin:
                 # Non-local CNOT style
 
                 # Get physical Bell pairs
-                event_external = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in) for _ in range(7)])
+                # event_external = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in) for _ in range(7)])
+                event_external = yield simpy.AllOf(self.env, [self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in) for _ in range(7)])
                 Bells = []
                 for bell in range(7):
                     tmp = yield event_external.events[bell]
@@ -68,7 +72,7 @@ class Mixin:
             elif protocol == 'Purified-encoded':
 
                 # Get physical Bell pairs
-                event_external = yield simpy.AllOf(self.env, [table[f'{node1}-{node2}'].get(lambda bell: bell[2] == label_in) for _ in range(1)])
+                event_external = yield simpy.AllOf(self.env, [self.resourceTables[node1][node2][table].get(lambda bell: bell[2] == label_in) for _ in range(1)])
                 encode_qubits = yield event_external.events[0]
 
                 encode_qubit1 = encode_qubits[0]
