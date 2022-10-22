@@ -556,7 +556,7 @@ class Configuration:
         self.numInternalEncodingBuffer = 20
         self.numInternalDetectingBuffer = 10
         self.numInternalInterfaceBuffer = 2
-        self.memFunc = np.inf if memory_function is None else memory_function # Function of memory of qubit
+        self.memory_function = np.inf if memory_function is None else memory_function # Function of memory of qubit
         self.gate_error = 0 if gate_error is None else gate_error
         self.measurement_error = 0 if measurement_error is None else measurement_error
         self.timeline = timeline
