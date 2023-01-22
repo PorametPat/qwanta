@@ -613,6 +613,9 @@ class Configuration:
         else:
             self.throughtputEdges = throughtput_edges
 
+        # Check if there key of 'schedule_config' in timeline
+        if not 'Schedule Config' in self.timeline.keys():
+            self.timeline['Schedule Config'] = None
 
 class QuantumNetwork(_GeneratePhyscialResource.Mixin, 
                      _EntanglementPurification.Mixin, 
@@ -836,7 +839,9 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                                                   num_required=process['Num Trials'])),
                     self.env.process(self.ClassicalMessageHandler(process['Edges'][0], process['Edges'][1], 
                                                   label_out=process['Label out'],
-                                                  num_required=process['Num Trials']))
+                                                  num_required=process['Num Trials'],
+                                                  schedule_config=process['Schedule Config']
+                                                  ))
                 ]
             elif process['Main Process'] in ['PrototypeGeneratePhysicalResourcePulseMidpoint', 'Generate physical Bell pair (Midpoint)']: 
                 p = [
@@ -848,7 +853,9 @@ class QuantumNetwork(_GeneratePhyscialResource.Mixin,
                                                   num_required=process['Num Trials'], middleNode=process['Edges'][1], EPPS=process['Protocol'])),
                     self.env.process(self.ClassicalMessageHandler(process['Edges'][0], process['Edges'][2], 
                                                   label_out=process['Label out'],
-                                                  num_required=process['Num Trials'], middleNode=process['Edges'][1]))
+                                                  num_required=process['Num Trials'], middleNode=process['Edges'][1],
+                                                  schedule_config=process['Schedule Config']
+                                                  ))
                 ]
             elif process['Main Process'] in ['PrototypeEntanglementSwapping', 'Entanglement swapping']:
                 p = [self.env.process(self.ExternalEntanglementSwapping(process,( process['Edges'][0], process['Edges'][1]), (process['Edges'][1], process['Edges'][2]), \

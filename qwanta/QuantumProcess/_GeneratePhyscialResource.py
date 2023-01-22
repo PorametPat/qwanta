@@ -3,7 +3,7 @@ import random
 import numpy as np
 from geopy.distance import distance, great_circle
 from ..Qubit import PhysicalQubit
-from typing import Union, Any, Optional, Tuple
+from typing import Union, Any, Optional, Tuple, Dict
 
 class Mixin:
 
@@ -346,7 +346,9 @@ class Mixin:
                                 node2: Any, 
                                 label_out: Optional[str] = '_Physical', 
                                 num_required: Optional[int] = 1, 
-                                middleNode: Optional[Any] = None):
+                                middleNode: Optional[Any] = None,
+                                schedule_config: Optional[Dict[str, Any]] = None
+                                ):
         """Check the result, 
            If True, then apply depolarizing error to the matter qubits on each node and register the new resource.
            If False, Set qubit free and return qubit to the self.QubitTables, as both nodes know that result is failed
@@ -359,6 +361,7 @@ class Mixin:
             label_out (Optional[str], optional): _description_. Defaults to '_Physical'.
             num_required (Optional[int], optional): _description_. Defaults to 1.
             middleNode (Optional[Any], optional): _description_. Defaults to None.
+            schedule_config (Optional[Dict[str, Any]], optional): _description_. Defaults to None.
 
         Yields:
             _type_: _description_
@@ -366,6 +369,10 @@ class Mixin:
 
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
+
+        # Get the first label out
+        if schedule_config is None:
+            label_out = self.scheduler(label_out, schedule_config)
 
         isSuccess = 0
 
@@ -383,6 +390,10 @@ class Mixin:
             
                 # Update resource
                 self.createLinkResource(node1, node2, freeQubitNode1, freeQubitNode2, 'physicalResourceTable', label=label_out)
+
+                # Get the next label out
+                if schedule_config is not None:
+                    label_out = self.scheduler(label_out, schedule_config)
                 
                 if not isinstance(num_required, bool):
                     isSuccess += 1
@@ -392,3 +403,27 @@ class Mixin:
                 freeQubitNode1.setFree(); freeQubitNode2.setFree()
                 self.QubitsTables['externalQubitsTable'][f'{node1}-{node2}'][f'QNICs-{node1}'].put(freeQubitNode1)
                 self.QubitsTables['externalQubitsTable'][f'{node1}-{node2}'][f'QNICs-{node2}'].put(freeQubitNode2)
+
+    def scheduler(self, lasted_label_produced: str, schedule_config: Dict[str, Any]):
+        """Scheduler reseouce to be generate next
+            The structure of schedule_config is as follow:
+            schedule_config = {
+                'label_out_order': ['label_1', 'label_2', 'label_3']
+            }
+
+        Args:
+            lasted_label_produced (str): label of last resource produced
+            schedule_config (Dict[str, Any]): dict contain how to schedule the resource
+        """
+
+        # Get the schedule config
+        label_out_order = schedule_config['label_out_order']
+        
+        # Using simple protocol of producing resource in cyclic order
+        # Get the index of last resource produced
+        index = label_out_order.index(lasted_label_produced)
+
+        # Get the next resource to be produced
+        label_out = label_out_order[(index + 1) % len(label_out_order)]
+
+        return label_out
