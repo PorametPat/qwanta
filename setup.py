@@ -22,6 +22,11 @@ setup(
             'numpy',
             'geopy',
             'sympy',
+            'ray',
+            'matplotlib',
+            'scipy',
+            'tqdm',
+            'openpyxl'
         ], # add any additional packages that 
         # needs to be installed along with your package. Eg: 'caer'
         
