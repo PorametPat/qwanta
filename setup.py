@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.0.3' 
+VERSION = '0.1.0' 
 DESCRIPTION = 'Discrete-event Quantum network simulator using error-basis model'
 LONG_DESCRIPTION = 'Inspire from QuISP by AQUA, Keio university, qwanta is simplified version with simplicity of python at your hand.'
 
