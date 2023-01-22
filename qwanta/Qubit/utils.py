@@ -1,4 +1,3 @@
-from sklearn import neighbors
 from .qubit import PhysicalQubit
 import random
 from sympy import Symbol
