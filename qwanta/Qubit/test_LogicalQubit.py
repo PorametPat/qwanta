@@ -12,8 +12,8 @@ class TestLogicalQubit(unittest.TestCase):
         self.memFunc = [1, 0, 0, 0]
         self.gateError = 0
         self.measurementError = 0
-        PhysicalQubits = [PhysicalQubit('Damm', 'you', i, 'boy!', 'encoding_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError) for i in range(7)]
-        self.logicalQubit = LogicalQubit('Damm', 'Steane', 'girl!', self.env)
+        PhysicalQubits = [PhysicalQubit('Node 1', 'Node 2', i, 'QNIC', 'encoding_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError) for i in range(7)]
+        self.logicalQubit = LogicalQubit('Node 1', 'logical_qubit_id', 'QNIC', self.env)
         self.logicalQubit.physical_list = PhysicalQubits
         for qubit in self.logicalQubit.physical_list:
             qubit.setInitialTime()
@@ -182,7 +182,7 @@ class TestLogicalQubit(unittest.TestCase):
 
     def test_errorDetectionCorrection_steane_standard(self):
 
-        AncillaQubits = [PhysicalQubit('Damm', 'you', i, 'boy!', 'detecting_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError) for i in range(6)]
+        AncillaQubits = [PhysicalQubit('Node 1', 'Node 2', i, 'QNIC', 'detecting_qubit', self.env, 'test', self.memFunc, self.gateError, self.measurementError) for i in range(6)]
         for qubit in AncillaQubits:
             qubit.setInitialTime()
         self.logicalQubit.ancilla_list = AncillaQubits
@@ -241,13 +241,13 @@ class TestLogicalQubit(unittest.TestCase):
         memFunc = [0.25, .25, .25, .25]
         gateError = 0.5
         measurementError = 1
-        PhysicalQubits = [PhysicalQubit('Damm', 'you', i, 'boy!', 'encoding_qubit', env, 'test', memFunc, gateError, measurementError) for i in range(7)]
+        PhysicalQubits = [PhysicalQubit('Node 1', 'Node 2', i, 'QNIC', 'encoding_qubit', env, 'test', memFunc, gateError, measurementError) for i in range(7)]
         logicalQubit = LogicalQubit('Damm', 'Steane', 'girl!', env)
         logicalQubit.physical_list = PhysicalQubits
         for qubit in logicalQubit.physical_list:
             qubit.setInitialTime()
 
-        AncillaQubits = [PhysicalQubit('Damm', 'you', i, 'boy!', 'detecting_qubit', env, 'test', memFunc, gateError, measurementError) for i in range(6)]
+        AncillaQubits = [PhysicalQubit('Node 1', 'Node 2', i, 'QNIC', 'detecting_qubit', env, 'test', memFunc, gateError, measurementError) for i in range(6)]
         for qubit in AncillaQubits:
             qubit.setInitialTime()
         logicalQubit.ancilla_list = AncillaQubits
