@@ -614,8 +614,10 @@ class Configuration:
             self.throughtputEdges = throughtput_edges
 
         # Check if there key of 'schedule_config' in timeline
-        if not 'Schedule Config' in self.timeline.keys():
-            self.timeline['Schedule Config'] = None
+        for process in self.timeline:
+            if process['Main Process'] in ['PrototypeGeneratePhysicalResourcePulse', 'Generate physical Bell pair', 'PrototypeGeneratePhysicalResourcePulseMidpoint', 'Generate physical Bell pair (Midpoint)']:
+                if not 'Schedule Config' in process.keys():
+                    process['Schedule Config'] = None
 
 class QuantumNetwork(_GeneratePhyscialResource.Mixin, 
                      _EntanglementPurification.Mixin, 

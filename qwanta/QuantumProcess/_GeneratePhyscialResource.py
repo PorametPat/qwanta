@@ -370,10 +370,6 @@ class Mixin:
         # Valiate node order
         node1, node2 = self.validateNodeOrder(node1, node2)
 
-        # Get the first label out
-        if schedule_config is None:
-            label_out = self.scheduler(label_out, schedule_config)
-
         isSuccess = 0
 
         while isSuccess < num_required: 
