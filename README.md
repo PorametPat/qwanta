@@ -8,5 +8,7 @@ To install the package, clone it locally via,
 ```
 $ git clone https://github.com/PorametPat/qwanta.git
 $ cd qwanta
-$ pip install .
+$ pip install -e .
 ```
+
+`-e` flag allowed the code changed to take effect without re-install the package. 
